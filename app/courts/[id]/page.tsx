@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import CourtPageClient from "./court-page-client";
 import type { CourtDetail } from "./court-data";
+import { getCourtWeather } from "./court-weather";
 import { loadExplorerCourt } from "../supabase-courts";
 
 async function getMapboxToken() {
@@ -9,6 +10,21 @@ async function getMapboxToken() {
     return env.MAPBOX_ACCESS_TOKEN ?? "";
   } catch {
     return process.env.MAPBOX_ACCESS_TOKEN ?? "";
+  }
+}
+
+async function getSupabasePublicConfig() {
+  try {
+    const { env } = await import("cloudflare:workers");
+    return {
+      url: env.SUPABASE_URL ?? "",
+      publishableKey: env.SUPABASE_PUBLISHABLE_KEY ?? "",
+    };
+  } catch {
+    return {
+      url: process.env.SUPABASE_URL ?? "",
+      publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY ?? "",
+    };
   }
 }
 
@@ -56,10 +72,18 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
 
   if (!court) notFound();
 
+  const [mapboxToken, weather, supabase] = await Promise.all([
+    getMapboxToken(),
+    getCourtWeather(court.coordinates),
+    getSupabasePublicConfig(),
+  ]);
+
   return (
     <CourtPageClient
       court={court}
-      mapboxToken={await getMapboxToken()}
+      mapboxToken={mapboxToken}
+      weather={weather}
+      supabase={supabase}
       todayIso={new Date().toISOString().slice(0, 10)}
     />
   );
