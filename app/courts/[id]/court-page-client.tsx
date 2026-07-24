@@ -17,9 +17,11 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { CourtDetail } from "./court-data";
+import type { CourtWeather } from "./court-weather";
+import type { SupabasePublicConfig } from "./supabase-planning";
 import WeeklyHeatmap from "./weekly-heatmap";
 
-function CourtMap({ court, token }: { court: CourtDetail; token: string }) {
+function CourtMap({ court, token, weather }: { court: CourtDetail; token: string; weather: CourtWeather | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mapState, setMapState] = useState<"loading" | "ready" | "unavailable">(token ? "loading" : "unavailable");
 
@@ -43,8 +45,10 @@ function CourtMap({ court, token }: { court: CourtDetail; token: string }) {
           pitch: 34,
           bearing: -14,
           attributionControl: false,
+          logoPosition: "top-left",
         });
 
+        map.addControl(new mapboxgl.AttributionControl({ compact: true }), "top-left");
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
         map.on("load", () => mounted && setMapState("ready"));
         map.on("error", () => mounted && setMapState("unavailable"));
@@ -77,7 +81,16 @@ function CourtMap({ court, token }: { court: CourtDetail; token: string }) {
       ) : null}
       <div className="court-map__topline">
         <span><i /> Verified place</span>
-        <span>{court.neighborhood}</span>
+        <div>
+          {weather ? (
+            <span className={`court-weather-label court-weather-label--${weather.icon}`} title={`Feels like ${weather.feelsLike}°, ${weather.precipitationChance}% rain, wind ${weather.windSpeed} mph`}>
+              <i aria-hidden="true" />
+              <strong>{weather.temperature}°</strong>
+              <span>{weather.label}</span>
+            </span>
+          ) : null}
+          <span>{court.neighborhood}</span>
+        </div>
       </div>
       <div className="court-map__caption">
         <div><strong>{court.name}</strong><span>{court.address}</span></div>
@@ -94,7 +107,19 @@ function CourtMap({ court, token }: { court: CourtDetail; token: string }) {
   );
 }
 
-export default function CourtPageClient({ court, mapboxToken, todayIso }: { court: CourtDetail; mapboxToken: string; todayIso: string }) {
+export default function CourtPageClient({
+  court,
+  mapboxToken,
+  weather,
+  supabase,
+  todayIso,
+}: {
+  court: CourtDetail;
+  mapboxToken: string;
+  weather: CourtWeather | null;
+  supabase: SupabasePublicConfig;
+  todayIso: string;
+}) {
   const [checkedIn, setCheckedIn] = useState(false);
   const [isLocal, setIsLocal] = useState(court.isLocal);
   const [planned, setPlanned] = useState<string[]>([]);
@@ -145,12 +170,12 @@ export default function CourtPageClient({ court, mapboxToken, todayIso }: { cour
           </div>
         </div>
 
-        <CourtMap court={court} token={mapboxToken} />
+        <CourtMap court={court} token={mapboxToken} weather={weather} />
       </section>
 
       <section className="court-page__content">
         <div className="court-page__main-column">
-          <WeeklyHeatmap court={court} todayIso={todayIso} isLocal={isLocal} onMakeLocal={() => setIsLocal(true)} />
+          <WeeklyHeatmap court={court} todayIso={todayIso} isLocal={isLocal} onMakeLocal={() => setIsLocal(true)} supabase={supabase} />
 
           <section className="court-panel court-panel--players">
             <header><div><span className="court-panel__eyebrow"><i /> At the court</span><h2>Who&apos;s here</h2></div><strong>{liveCount} live</strong></header>
