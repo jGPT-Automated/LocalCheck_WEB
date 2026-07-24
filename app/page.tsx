@@ -216,6 +216,7 @@ export default function Home() {
       <section className="hero" ref={heroRef}>
         <img className="hero__art" src="/hero-map.png" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
         <div className="hero__veil" aria-hidden="true" />
+        <div className="hero__court-focus" aria-hidden="true"><i /><i /><i /></div>
 
         <header className="site-header">
           <Brand />
@@ -261,9 +262,8 @@ export default function Home() {
         </div>
 
         <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
-          <span>Scan to preview the app</span>
           <img src="/qr-localcheck.png" alt="QR code for LocalCheck" width="78" height="78" />
-          <ArrowUpRight size={17} weight="bold" />
+          <span>Download App</span>
         </a>
       </section>
 
