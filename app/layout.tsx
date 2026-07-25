@@ -5,6 +5,7 @@ import "@fontsource/oswald/600.css";
 import "@fontsource/oswald/700.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
+import "./hero-scroll.css";
 
 export const metadata: Metadata = {
   title: "LocalCheck — Find Your Run",
