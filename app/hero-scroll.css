@@ -5,7 +5,9 @@
   --copy-shift: 0px;
   --copy-opacity: 1;
   --header-opacity: 1;
+  --header-shift: 0px;
   --signal-opacity: 1;
+  --signal-shift: 0px;
   --scroll-cue-opacity: 1;
   --aura-scale: 0.92;
   --aura-opacity: 0.42;
@@ -141,7 +143,7 @@
 
 .hero--scroll .site-header {
   opacity: var(--header-opacity);
-  transform: translateY(calc((1 - var(--header-opacity)) * -18px));
+  transform: translateY(var(--header-shift));
   will-change: transform, opacity;
 }
 
@@ -154,7 +156,7 @@
 .hero--scroll .hero__signal,
 .hero--scroll .qr-card {
   opacity: var(--signal-opacity);
-  transform: translateY(calc((1 - var(--signal-opacity)) * 18px));
+  transform: translateY(var(--signal-shift));
   will-change: transform, opacity;
 }
 
