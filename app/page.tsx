@@ -70,6 +70,10 @@ const courts: Court[] = [
   },
 ];
 
+const clamp = (value: number, minimum = 0, maximum = 1) => Math.min(maximum, Math.max(minimum, value));
+const rangeProgress = (value: number, from: number, to: number) => clamp((value - from) / Math.max(to - from, 0.0001));
+const easeOutCubic = (value: number) => 1 - Math.pow(1 - value, 3);
+
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <a className={`brand${compact ? " brand--compact" : ""}`} href="#top" aria-label="LocalCheck home">
@@ -180,23 +184,48 @@ export default function Home() {
     const hero = heroRef.current;
     if (!hero || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    let frame = 0;
-    const update = () => {
-      const progress = Math.min(1, Math.max(0, window.scrollY / Math.max(window.innerHeight, 1)));
-      hero.style.setProperty("--hero-shift", `${progress * -46}px`);
-      hero.style.setProperty("--hero-scale", `${1 + progress * 0.055}`);
-      hero.style.setProperty("--copy-shift", `${progress * 22}px`);
-      hero.style.setProperty("--hero-opacity", `${1 - progress * 0.2}`);
-      frame = 0;
+    let animationFrame = 0;
+
+    const updateTimeline = () => {
+      const rect = hero.getBoundingClientRect();
+      const scrollDistance = Math.max(hero.offsetHeight - window.innerHeight, 1);
+      const progress = clamp(-rect.top / scrollDistance);
+      const eased = easeOutCubic(progress);
+      const copyExit = rangeProgress(progress, 0.26, 0.72);
+      const chromeExit = rangeProgress(progress, 0.56, 0.9);
+      const cueExit = rangeProgress(progress, 0.03, 0.2);
+
+      hero.style.setProperty("--map-scale", `${1.015 + eased * 0.145}`);
+      hero.style.setProperty("--map-x", `${eased * -1.8}vw`);
+      hero.style.setProperty("--map-y", `${eased * -4.8}vh`);
+      hero.style.setProperty("--copy-shift", `${copyExit * 64}px`);
+      hero.style.setProperty("--copy-opacity", `${1 - copyExit}`);
+      hero.style.setProperty("--header-opacity", `${1 - chromeExit}`);
+      hero.style.setProperty("--header-shift", `${chromeExit * -18}px`);
+      hero.style.setProperty("--signal-opacity", `${1 - rangeProgress(progress, 0.42, 0.8)}`);
+      hero.style.setProperty("--signal-shift", `${rangeProgress(progress, 0.42, 0.8) * 18}px`);
+      hero.style.setProperty("--scroll-cue-opacity", `${1 - cueExit}`);
+      hero.style.setProperty("--aura-scale", `${0.92 + eased * 0.2}`);
+      hero.style.setProperty("--aura-opacity", `${0.42 + eased * 0.22}`);
+      hero.style.setProperty("--route-bloom-opacity", `${0.34 + eased * 0.2}`);
+      hero.style.setProperty("--stage-shade", `${eased * 0.065}`);
+      hero.dataset.scrollProgress = progress.toFixed(3);
+
+      animationFrame = 0;
     };
-    const onScroll = () => {
-      if (!frame) frame = window.requestAnimationFrame(update);
+
+    const requestTimelineUpdate = () => {
+      if (!animationFrame) animationFrame = window.requestAnimationFrame(updateTimeline);
     };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
+
+    updateTimeline();
+    window.addEventListener("scroll", requestTimelineUpdate, { passive: true });
+    window.addEventListener("resize", requestTimelineUpdate);
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestTimelineUpdate);
+      window.removeEventListener("resize", requestTimelineUpdate);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
     };
   }, []);
 
@@ -213,58 +242,78 @@ export default function Home() {
 
   return (
     <main id="top">
-      <section className="hero" ref={heroRef}>
-        <img className="hero__art" src="/hero-map.png" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
-        <div className="hero__veil" aria-hidden="true" />
+      <section className="hero hero--scroll" ref={heroRef} aria-label="LocalCheck animated launch map">
+        <div className="hero__stage">
+          <img
+            className="hero__art"
+            src="/hero-map.png"
+            alt="Dark topographic Austin map with live routes converging at a basketball court"
+            fetchPriority="high"
+            decoding="async"
+          />
+          <div className="hero__route-bloom" aria-hidden="true" />
+          <div className="hero__court-aura" aria-hidden="true">
+            <span className="hero__aura-ring hero__aura-ring--outer" />
+            <span className="hero__aura-ring hero__aura-ring--middle" />
+            <span className="hero__aura-ring hero__aura-ring--inner" />
+            <span className="hero__aura-core" />
+          </div>
+          <div className="hero__veil" aria-hidden="true" />
+          <div className="hero__frame-sheen" aria-hidden="true" />
 
-        <header className="site-header">
-          <Brand />
-          <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/courts">Find games</Link>
-            <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
-            <button type="button" onClick={() => scrollTo("#about")}>About</button>
-            <button type="button" onClick={() => setNotice("Login opens in the LocalCheck app.")}>Log in</button>
-            <button className="nav-cta" type="button" onClick={() => scrollTo("#courts")}>Check in</button>
-          </nav>
-          <button className="menu-button" type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-label="Open navigation">
-            {menuOpen ? <X size={25} /> : <List size={27} />}
-          </button>
-        </header>
+          <header className="site-header">
+            <Brand />
+            <nav className="desktop-nav" aria-label="Primary navigation">
+              <Link href="/courts">Find games</Link>
+              <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
+              <button type="button" onClick={() => scrollTo("#about")}>About</button>
+              <button type="button" onClick={() => setNotice("Login opens in the LocalCheck app.")}>Log in</button>
+              <button className="nav-cta" type="button" onClick={() => scrollTo("#courts")}>Check in</button>
+            </nav>
+            <button className="menu-button" type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-label="Open navigation">
+              {menuOpen ? <X size={25} /> : <List size={27} />}
+            </button>
+          </header>
 
-        {menuOpen ? (
-          <nav className="mobile-nav" aria-label="Mobile navigation">
-            <Link href="/courts" onClick={() => setMenuOpen(false)}>Find games</Link>
-            <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
-            <button type="button" onClick={() => scrollTo("#about")}>About</button>
-            <button type="button" onClick={() => { setNotice("Login opens in the LocalCheck app."); setMenuOpen(false); }}>Log in</button>
-          </nav>
-        ) : null}
+          {menuOpen ? (
+            <nav className="mobile-nav" aria-label="Mobile navigation">
+              <Link href="/courts" onClick={() => setMenuOpen(false)}>Find games</Link>
+              <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
+              <button type="button" onClick={() => scrollTo("#about")}>About</button>
+              <button type="button" onClick={() => { setNotice("Login opens in the LocalCheck app."); setMenuOpen(false); }}>Log in</button>
+            </nav>
+          ) : null}
 
-        <div className="hero__copy">
-          <span className="hero__eyebrow"><i /> Seven cities now mapped</span>
-          <h1>Find<br />your<br />run<span>.</span></h1>
-          <p>Live courts. Real competition.</p>
-          <div className="hero__actions">
-            <Link className="button button--hero" href="/courts">
-              Explore 56 courts <ArrowRight size={19} weight="bold" />
-            </Link>
-            <button className="text-button" type="button" onClick={() => scrollTo("#how")}>See how it works <CaretRight size={17} weight="bold" /></button>
+          <div className="hero__copy">
+            <span className="hero__eyebrow"><i /> Seven cities now mapped</span>
+            <h1>Find<br />your<br />run<span>.</span></h1>
+            <p>Live courts. Real competition.</p>
+            <div className="hero__actions">
+              <Link className="button button--hero" href="/courts">
+                Explore 56 courts <ArrowRight size={19} weight="bold" />
+              </Link>
+              <button className="text-button" type="button" onClick={() => scrollTo("#how")}>See how it works <CaretRight size={17} weight="bold" /></button>
+            </div>
+          </div>
+
+          <div className="hero__signal" aria-label="LocalCheck launch court summary">
+            <span><strong>56</strong> launch courts</span>
+            <i />
+            <span><strong>28</strong> basketball</span>
+            <i />
+            <span><strong>28</strong> pickleball</span>
+          </div>
+
+          <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
+            <span>Scan to preview the app</span>
+            <img src="/qr-localcheck.png" alt="QR code for LocalCheck" width="78" height="78" />
+          </a>
+
+          <div className="hero__scroll-cue" aria-hidden="true">
+            <i />
+            Scroll to enter the court
           </div>
         </div>
-
-        <div className="hero__signal" aria-label="LocalCheck launch court summary">
-          <span><strong>56</strong> launch courts</span>
-          <i />
-          <span><strong>28</strong> basketball</span>
-          <i />
-          <span><strong>28</strong> pickleball</span>
-        </div>
-
-        <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
-          <span>Scan to preview the app</span>
-          <img src="/qr-localcheck.png" alt="QR code for LocalCheck" width="78" height="78" />
-          <ArrowUpRight size={17} weight="bold" />
-        </a>
       </section>
 
       <section className="live-courts section" id="courts">
