@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   title: "LocalCheck — Find Your Run",
   description: "Find live basketball and pickleball courts, see who is playing, and check in with one tap.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
   },
   openGraph: {
     title: "LocalCheck — Find Your Run",
@@ -21,10 +21,10 @@ export const metadata: Metadata = {
     siteName: "LocalCheck",
     images: [
       {
-        url: "/hero-map.png",
-        width: 1664,
-        height: 936,
-        alt: "LocalCheck live court map",
+        url: "/localcheck-logo-final-preview.png",
+        width: 5160,
+        height: 808,
+        alt: "LocalCheck",
       },
     ],
     type: "website",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LocalCheck — Find Your Run",
     description: "Find live basketball and pickleball courts, see who is playing, and check in with one tap.",
-    images: ["/hero-map.png"],
+    images: ["/localcheck-logo-final-preview.png"],
   },
   other: {
     "codex-preview": "development",
