@@ -238,7 +238,7 @@ a:focus-visible {
 
 .mobile-nav button,
 .mobile-nav > a {
-  min-height: 50px;
+  min-height: 42px;
   padding: 0 16px;
   border-radius: 10px;
   text-align: left;
