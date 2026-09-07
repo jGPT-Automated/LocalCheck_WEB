@@ -13,8 +13,7 @@ City, Washington DC, Miami, Los Angeles, Houston, Austin, and Denver.
 - Supabase schema, RLS policy, public stats view, and idempotent seed
 - Review workbook and source/provenance fields for every launch court
 
-The launch catalog intentionally starts live/local counters at zero. Product
-surfaces do not fabricate players, planned visits, or traffic curves.
+Public activity counts are omitted until test-data isolation is deployed. Player information and account actions remain in the app. Court-loading failures are explicitly unavailable, never a bundled catalog or synthetic zero.
 
 ## Run locally
 
@@ -34,7 +33,7 @@ Set these values in `.env.local`:
 
 ## Court data
 
-- `data/launch-courts.json` is the website fallback and canonical seed source.
+- `public.courts_with_stats` in the app’s production Supabase project is the website’s runtime source. The historical JSON/CSV/seed files are not a runtime fallback; do not reseed from this website.
 - `data/launch-courts.csv` is the flat review/export format.
 - `docs/data/localcheck-launch-courts.xlsx` is the styled review workbook.
 - `docs/COURT_DATA_STANDARD.md` defines the naming and provenance rules.

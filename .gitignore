@@ -43,3 +43,5 @@ next-env.d.ts
 /outputs/
 /work/
 *.inspect.ndjson
+
+.dev.vars*

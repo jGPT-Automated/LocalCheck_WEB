@@ -1,4 +1,3 @@
-import launchCourtRows from "../../data/launch-courts.json";
 import { courtShortName } from "../../lib/court-name";
 
 export type CourtSport = "basketball" | "pickleball";
@@ -32,7 +31,7 @@ export type ExplorerCourt = {
 
 export type CourtDataResult = {
   courts: ExplorerCourt[];
-  source: "supabase" | "curated";
+  source: "supabase" | "unavailable";
 };
 
 type RuntimeEnv = {
@@ -42,56 +41,11 @@ type RuntimeEnv = {
 
 type RawCourt = Record<string, unknown>;
 
-type CuratedCourtRow = {
-  slug: string;
-  name: string;
-  short_name: string;
-  sport: CourtSport;
-  market: string;
-  address: string;
-  city: string;
-  state: string;
-  latitude: number;
-  longitude: number;
-  court_count: number | null;
-  setting: string;
-  access_type: CourtAccess;
-  verification_status: string;
-  source_url: string;
-  launch_priority: number;
-};
-
 function indoorFromSetting(setting: string) {
   if (setting === "indoor") return true;
   if (setting === "outdoor" || setting === "outdoor_covered") return false;
   return null;
 }
-
-export const launchCourts: ExplorerCourt[] = (launchCourtRows as CuratedCourtRow[]).map((row) => ({
-  id: row.slug,
-  slug: row.slug,
-  name: row.name,
-  shortName: row.short_name,
-  sport: row.sport,
-  market: row.market,
-  address: row.address,
-  city: row.city,
-  state: row.state,
-  latitude: row.latitude,
-  longitude: row.longitude,
-  courtCount: row.court_count,
-  setting: row.setting,
-  surface: "",
-  indoor: indoorFromSetting(row.setting),
-  hasLights: null,
-  accessType: row.access_type,
-  verified: row.verification_status !== "needs_review",
-  verificationStatus: row.verification_status,
-  sourceUrl: row.source_url,
-  priority: row.launch_priority,
-  liveCount: 0,
-  localCount: 0,
-}));
 
 async function getRuntimeEnv(): Promise<RuntimeEnv> {
   try {
@@ -214,10 +168,10 @@ function normalizeCourt(raw: RawCourt, index: number): ExplorerCourt | null {
     verified: booleanValue(raw.is_confirmed, raw.is_verified, raw.verified)
       ?? (verificationStatus === "source_verified" || verificationStatus === "source_and_detection"),
     verificationStatus,
-    sourceUrl: stringValue(raw.source_url),
-    priority: numberValue(raw.launch_priority) ?? 0,
-    liveCount: numberValue(raw.active_check_in_count, raw.live_count, raw.active_count, raw.active_check_ins, raw.check_in_count),
-    localCount: numberValue(raw.local_player_count, raw.local_count, raw.locals_count, raw.local_players),
+    sourceUrl: "",
+    priority: 0,
+    liveCount: null,
+    localCount: null,
   };
 }
 
@@ -230,7 +184,7 @@ async function fetchRows(path: string, query: Record<string, string>) {
   const url = new URL(`${baseUrl}/rest/v1/${path}`);
   Object.entries(query).forEach(([key, value]) => url.searchParams.set(key, value));
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 1800);
+  const timeout = setTimeout(() => controller.abort(), 8000);
 
   try {
     const response = await fetch(url, {
@@ -240,41 +194,39 @@ async function fetchRows(path: string, query: Record<string, string>) {
     });
     if (!response.ok) throw new Error(`Supabase returned ${response.status}`);
     const rows = await response.json();
-    return Array.isArray(rows) ? rows as RawCourt[] : [];
+    if (!Array.isArray(rows)) throw new Error("Invalid court response");
+    return rows as RawCourt[];
   } finally {
     clearTimeout(timeout);
   }
 }
 
+// Public venue fields only. Activity counters are omitted until QA isolation is deployed.
+const PUBLIC_FIELDS = "id,slug,name,short_name,address,city,state,market,latitude,longitude,sport_type,access_type,setting,court_count,surface,indoor,has_lights,is_confirmed";
+
 export async function loadExplorerCourts(): Promise<CourtDataResult> {
   try {
-    const rows = await fetchRows("courts_with_stats", {
-      select: "*",
-      order: "launch_priority.desc,name.asc",
-      limit: "250",
-    });
-    const courts = rows.map(normalizeCourt).filter((court): court is ExplorerCourt => Boolean(court));
-    if (courts.length) return { courts, source: "supabase" };
+    const courts: ExplorerCourt[] = [];
+    const pageSize = 500;
+    // Pagination keeps later additions on the shared view without a second catalog.
+    for (let offset = 0; ; offset += pageSize) {
+      const rows = await fetchRows("courts_with_stats", {
+        select: PUBLIC_FIELDS, order: "id.asc", limit: String(pageSize), offset: String(offset),
+      });
+      courts.push(...rows.map(normalizeCourt).filter((court): court is ExplorerCourt => Boolean(court)));
+      if (rows.length < pageSize) break;
+      if (offset >= 9500) throw new Error("Court catalog requires viewport pagination");
+    }
+    return { courts, source: "supabase" };
   } catch {
-    // The source-backed launch set keeps the map usable during maintenance.
+    return { courts: [], source: "unavailable" };
   }
-
-  return { courts: launchCourts, source: "curated" };
 }
 
 export async function loadExplorerCourt(idOrSlug: string): Promise<ExplorerCourt | null> {
-  try {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug);
-    const rows = await fetchRows("courts_with_stats", {
-      select: "*",
-      [isUuid ? "id" : "slug"]: `eq.${idOrSlug}`,
-      limit: "1",
-    });
-    const court = rows.length ? normalizeCourt(rows[0], 0) : null;
-    if (court) return court;
-  } catch {
-    // Fall through to the bundled, verified catalog.
-  }
-
-  return launchCourts.find((court) => court.id === idOrSlug || court.slug === idOrSlug) ?? null;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug);
+  const rows = await fetchRows("courts_with_stats", {
+    select: PUBLIC_FIELDS, [isUuid ? "id" : "slug"]: `eq.${idOrSlug}`, limit: "1",
+  });
+  return rows.length ? normalizeCourt(rows[0], 0) : null;
 }

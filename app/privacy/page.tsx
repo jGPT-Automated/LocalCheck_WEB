@@ -48,8 +48,8 @@ export default function PrivacyPolicy() {
           <h1 id="privacy-title">Privacy<br />Policy<span>.</span></h1>
         </div>
         <div className="legal-meta" aria-label="Policy publication details">
-          <p><span>Effective date</span><strong>August 13, 2026</strong></p>
-          <p><span>Operator</span><strong>Jesse Herrig</strong></p>
+          <p><span>Effective date</span><strong>September 6, 2026</strong></p>
+          <p><span>Contact</span><strong>LocalCheck Support</strong></p>
         </div>
       </section>
 
@@ -65,7 +65,7 @@ export default function PrivacyPolicy() {
 
         <article className="legal-copy">
           <p className="legal-intro">
-            LocalCheck is operated by Jesse Herrig. This Privacy Policy explains how LocalCheck
+            LocalCheck is operated by Jesse Harrick. This Privacy Policy explains how LocalCheck
             (&ldquo;LocalCheck,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) collects, uses, shares, and protects information
             when you use the LocalCheck mobile application, website, and related services.
           </p>
@@ -87,7 +87,8 @@ export default function PrivacyPolicy() {
             <ul>
               <li><strong>Account and profile information.</strong> Your name, email address, user identifier, sign-in provider, and profile details.</li>
               <li><strong>Court and activity information.</strong> Court submissions, check-ins, local-court selections, planned visits, verification results, and other activity you choose to share through LocalCheck.</li>
-              <li><strong>Photos.</strong> Photos you take or select when submitting a court for verification. The submitted image is sent through our backend to Google Gemini for analysis. The current verification flow does not retain the image after that analysis.</li>
+              <li><strong>Photos.</strong> Photos you take or select when submitting a court for verification. The submitted image is sent through our backend to Google Gemini for analysis. Contact us if you want help with a submitted photo or a deletion request.</li>
+              <li><strong>Purchases.</strong> If you purchase LocalPlus, Apple processes payment. Subscription identifiers, purchase status, and entitlement information are used to provide paid access; LocalCheck does not receive your payment card details. RevenueCat supports subscription processing when enabled in the app.</li>
               <li><strong>Communications.</strong> Information you include when you contact us for support or privacy questions.</li>
             </ul>
             <h3>Information collected when you use LocalCheck</h3>
@@ -98,7 +99,7 @@ export default function PrivacyPolicy() {
             </ul>
             <p>
               Some profile and court-activity information is designed to be visible to other
-              LocalCheck users. The app identifies public information at the point where you share it.
+              LocalCheck users. Use the privacy controls available in your app version. Other participants may need access to shared game information to review results. The public website does not display individual player profiles, rosters, or check-ins.
             </p>
           </section>
 
@@ -126,6 +127,7 @@ export default function PrivacyPolicy() {
               <li><strong>Supabase</strong> for authentication, databases, backend functions, and service infrastructure;</li>
               <li><strong>Mapbox</strong> for maps and location-based court discovery;</li>
               <li><strong>Google Gemini</strong> to analyze submitted court-verification photos;</li>
+              <li><strong>RevenueCat</strong> for subscription validation and entitlement management when using LocalPlus purchases;</li>
               <li><strong>Apple and Expo</strong> for sign-in, app services, distribution, and notifications; and</li>
               <li>professional advisers, authorities, or other parties when required by law, needed to protect rights and safety, or involved in a business transfer.</li>
             </ul>
@@ -149,8 +151,7 @@ export default function PrivacyPolicy() {
               deletion removes or de-identifies associated personal information unless we must keep
               limited information for legal, security, fraud-prevention, or backup purposes. When
               deletion involves Sign in with Apple, LocalCheck also initiates revocation of the
-              associated Apple authorization. Court-verification photos are analyzed for the
-              submission and are not retained by the current verification flow afterward.
+              associated Apple authorization. You may also contact us about court-submission information.
             </p>
           </section>
 
@@ -206,8 +207,8 @@ export default function PrivacyPolicy() {
               For questions or requests about this policy or LocalCheck&apos;s privacy practices, contact:
             </p>
             <address>
-              <strong>Jesse Herrig</strong>
-              <span>LocalCheck</span>
+              <strong>LocalCheck Support</strong>
+              <span>Jesse Harrick · LocalCheck operator</span>
               <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>
             </address>
           </section>

@@ -25,7 +25,7 @@ type MapState = "loading" | "ready" | "unavailable";
 type Props = {
   initialCourts: ExplorerCourt[];
   mapboxToken: string;
-  source: "supabase" | "curated";
+  source: "supabase" | "unavailable";
 };
 
 function featureCollection(courts: ExplorerCourt[]) {
@@ -154,22 +154,22 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
 
   useEffect(() => {
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 2600);
+    const timeout = window.setTimeout(() => controller.abort(), 10000);
 
     const refresh = async () => {
       try {
         const response = await fetch("/api/courts", { signal: controller.signal });
-        if (!response.ok) return;
+        if (!response.ok) throw new Error("Courts unavailable");
         const result = await response.json() as {
           courts?: ExplorerCourt[];
-          source?: "supabase" | "curated";
+          source?: "supabase" | "unavailable";
         };
-        if (result.source === "supabase" && result.courts?.length) {
-          setCourts(result.courts);
+        if (result.source === "supabase" && Array.isArray(result.courts)) {
+          setCourts(result.courts!);
           setDataSource("supabase");
         }
       } catch {
-        // The bundled launch courts are already interactive; refresh is optional.
+        setDataSource("unavailable");
       } finally {
         window.clearTimeout(timeout);
       }
@@ -361,7 +361,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
           <b>LOCALCHECK</b>
         </Link>
         <div className={styles.navCenter}>
-          <span><i /> Source-backed launch set</span>
+          <span><i /> Courts on LocalCheck</span>
           <strong>{markets.length} cities · {courts.length.toLocaleString()} courts</strong>
         </div>
         <Link className={styles.back} href="/"><ArrowLeft size={16} weight="bold" /> Back home</Link>
@@ -370,9 +370,10 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
       <div className={styles.shell}>
         <aside className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
+            {dataSource === "unavailable" ? <p role="alert">Court data is temporarily unavailable. Please reload to try again.</p> : null}
             <span className={styles.eyebrow}><i /> Find your run</span>
             <div className={styles.titleRow}>
-              <div><h1>Find a court.</h1><p>Source-backed places now. Live community data as it grows.</p></div>
+              <div><h1>Find a court.</h1><p>Browse the same public courts as the app. Check in and plan games in LocalCheck.</p></div>
               <button className={styles.mobileFilter} type="button" onClick={() => setFiltersOpen((value) => !value)} aria-label="Toggle filters" aria-expanded={filtersOpen}>
                 {filtersOpen ? <X size={19} /> : <SlidersHorizontal size={19} />}
               </button>
@@ -399,7 +400,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             </div>
             <div className={styles.resultMeta}>
               <strong>{filteredCourts.length.toLocaleString()} {filteredCourts.length === 1 ? "court" : "courts"}</strong>
-              <span className={dataSource === "supabase" ? styles.liveSource : styles.previewSource}><i /> {dataSource === "supabase" ? "Supabase live" : "Verified launch set"}</span>
+              <span className={dataSource === "supabase" ? styles.liveSource : styles.previewSource}><i /> {dataSource === "supabase" ? "Shared court listings" : "Connection unavailable"}</span>
             </div>
           </div>
 
