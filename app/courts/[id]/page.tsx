@@ -1,66 +1,22 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import CourtPageClient from "./court-page-client";
-import type { CourtDetail } from "./court-data";
 import { loadExplorerCourt } from "../supabase-courts";
-
-async function getMapboxToken() {
-  try {
-    const { env } = await import("cloudflare:workers");
-    return env.MAPBOX_ACCESS_TOKEN ?? "";
-  } catch {
-    return process.env.MAPBOX_ACCESS_TOKEN ?? "";
-  }
-}
 
 export default async function CourtPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const lookupId = id === "basketball"
-    ? "austin-basketball-hancock"
-    : id === "pickleball" ? "austin-pickleball-pan-am" : id;
-  let court: CourtDetail | undefined;
-
-  if (!court) {
-    const listing = await loadExplorerCourt(lookupId);
-    if (listing) {
-      const setting = listing.setting
-        ? listing.setting.replaceAll("_", " ").replace(/^./, (value) => value.toUpperCase())
-        : listing.indoor === true ? "Indoor" : listing.indoor === false ? "Outdoor" : "Not listed";
-      const access = listing.accessType === "private_paid"
-        ? "Private · paid"
-        : listing.accessType === "public_paid" ? "Public · fees may apply" : "Public · free";
-      court = {
-        id: listing.id,
-        name: listing.name,
-        sport: listing.sport === "pickleball" ? "Pickleball" : "Basketball",
-        address: [listing.address, listing.city, listing.state].filter(Boolean).join(", "),
-        neighborhood: [listing.city, listing.state].filter(Boolean).join(", ") || "Local court",
-        distance: "Map listing",
-        coordinates: [listing.longitude, listing.latitude],
-        liveCount: listing.liveCount ?? 0,
-        localCount: listing.localCount ?? 0,
-        isLocal: false,
-        liveNote: listing.liveCount ? "Players checked in" : "No public check-ins yet",
-        peakWindow: "Weekly intent builds as locals make plans",
-        details: [
-          { label: "Setup", value: listing.courtCount ? `${listing.courtCount} ${listing.courtCount === 1 ? "court" : "courts"}` : "Not listed" },
-          { label: "Access", value: access },
-          { label: "Setting", value: setting },
-          { label: "Status", value: listing.verified ? "Source verified" : "Needs review" },
-        ],
-        players: [],
-        schedule: [],
-        activity: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      } satisfies CourtDetail;
-    }
-  }
-
+  let court;
+  try { court = await loadExplorerCourt(id); }
+  catch { return <main className="legal-page"><header className="legal-header"><Link href="/courts">← All courts</Link></header><section className="legal-hero"><h1>Court unavailable</h1><p role="alert">We could not load this court. Please try again shortly.</p></section></main>; }
   if (!court) notFound();
-
-  return (
-    <CourtPageClient
-      court={court}
-      mapboxToken={await getMapboxToken()}
-      todayIso={new Date().toISOString().slice(0, 10)}
-    />
-  );
+  return <main className="legal-page">
+    <header className="legal-header"><Link className="brand" href="/">LOCALCHECK</Link><Link href="/courts">← All courts</Link></header>
+    <section className="legal-hero"><div><span className="eyebrow eyebrow--orange">{court.sport}</span><h1 style={{fontSize:"clamp(2rem, 6vw, 5rem)"}}>{court.name}</h1><p>{[court.address, court.city, court.state].filter(Boolean).join(", ")}</p></div></section>
+    <article className="legal-copy section">
+      <h2>Court details</h2><ul><li>Courts: {court.courtCount ?? "Not listed"}</li><li>Setting: {court.setting.replaceAll("_", " ") || "Not listed"}</li><li>Access: {court.accessType === "public_free" ? "Public · free" : court.accessType === "public_paid" ? "Public · fees may apply" : "Private · fees may apply"}</li></ul>
+      <p>Check local opening hours, access rules, and conditions before traveling.</p>
+      <a className="button button--hero" href={`https://maps.apple.com/?ll=${court.latitude},${court.longitude}&q=${encodeURIComponent(court.name)}`}>Open directions</a>
+      <h2>Play here with LocalCheck</h2><p>Check in, choose your home court, plan a game, and view player activity in the app. The website shows public court information; it does not check you in or change your account.</p>
+      <a href="mailto:localchecksports@gmail.com?subject=LocalCheck%20pilot">Join the iPhone pilot</a>
+    </article><footer className="legal-footer"><Link href="/support">LocalCheck Support</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></footer>
+  </main>;
 }

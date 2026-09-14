@@ -61,11 +61,11 @@ export default function SupportPage() {
           </p>
           <p>
             <span>Response time</span>
-            <strong>We reply within 1 business day</strong>
+            <strong>Email our support team</strong>
           </p>
           <p>
-            <span>Operator</span>
-            <strong>Jesse Herrig</strong>
+            <span>Contact</span>
+            <strong>LocalCheck Support</strong>
           </p>
         </div>
       </section>
@@ -90,8 +90,7 @@ export default function SupportPage() {
             <p>
               The fastest way to reach the LocalCheck team is email. Send bug reports, account
               questions, privacy requests, court corrections, or general feedback to{" "}
-              <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>. We
-              reply within one business day.
+              <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>. We read support and safety reports sent to this address.
             </p>
             <p>
               For privacy or data requests (access, correction, deletion, copy of personal
@@ -106,8 +105,7 @@ export default function SupportPage() {
             <p>To help us fix a problem quickly, include the following in your message:</p>
             <ul>
               <li>
-                <strong>App version.</strong> Find it under <em>Settings &rarr; About</em> in the
-                LocalCheck app.
+                <strong>App version.</strong> Include the version and build shown in TestFlight or the app.
               </li>
               <li>
                 <strong>Device and iOS version.</strong> Example: iPhone 14, iOS 17.5.
@@ -146,12 +144,10 @@ export default function SupportPage() {
             <ul>
               <li>
                 <strong>How do I check in at a court?</strong> Open the LocalCheck app, find the
-                court on the Explore map, tap the court card, and tap Check in. Your local
-                community sees the court light up in real time.
+                court on the Explore map, tap the court card, and tap Check in. Check-ins and player activity are available in the app.
               </li>
               <li>
-                <strong>A court on the map is wrong or missing.</strong> Tap the court card in
-                the app and use Report an issue, or email us at localchecksports@gmail.com with
+                <strong>A court on the map is wrong or missing.</strong> Email us at localchecksports@gmail.com with
                 the court name, city, and what&rsquo;s wrong (missing lines, wrong surface type,
                 etc.).
               </li>
@@ -177,14 +173,16 @@ export default function SupportPage() {
                 <Link href="/privacy">Privacy Policy</Link> for the full picture.
               </li>
             </ul>
+            <h3>LocalPlus and subscriptions</h3>
+            <p>LocalPlus is the optional paid membership. Available plans, prices, and included features are shown in the app before purchase. Manage or cancel an Apple subscription in your Apple account subscriptions settings. Deleting your LocalCheck account does not cancel an Apple subscription.</p>
+            <p>For a missing purchase, use Restore Purchases in the app when available and contact us with the affected account and purchase date. Do not send your password or payment card details.</p>
+            <h3>Safety</h3><p>Use in-app report and block controls for unwanted behavior, or email support. Include the username and relevant details without sharing sensitive information publicly.</p>
             <h3>Courts and verification</h3>
             <ul>
               <li>
                 <strong>How do courts get verified and added to the map?</strong> Local court
                 submissions go through a verification flow. Photos are sent to Google Gemini for
-                analysis during verification; the current verification flow does not retain
-                those photos after analysis. A court only lights up on the map once verification
-                is complete.
+                analysis during verification; contact support with questions about a submission or its photo. Accepted submissions appear in the shared court catalog.
               </li>
             </ul>
           </section>
@@ -198,7 +196,7 @@ export default function SupportPage() {
               </li>
               <li>
                 <Link href="/privacy">Privacy Policy</Link>
-              </li>
+              </li><li><Link href="/terms">Terms of Use</Link></li>
               <li>
                 <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>
               </li>

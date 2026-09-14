@@ -9,66 +9,16 @@ import {
   Check,
   Clock,
   CornersOut,
-  House,
   List,
   MapPin,
   PingPong,
-  UsersThree,
   X,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-type Sport = "basketball" | "pickleball";
 
-type Court = {
-  id: string;
-  sportId: Sport;
-  name: string;
-  sport: string;
-  status: string;
-  location: string;
-  count: number;
-  courtCount: string;
-  detail: string;
-  players: string[];
-  localCount: number;
-  isLocal: boolean;
-  activity: string;
-};
-
-const courts: Court[] = [
-  {
-    id: "austin-basketball-hancock",
-    sportId: "basketball",
-    name: "Hancock Recreation Center",
-    sport: "Basketball",
-    status: "Austin launch court",
-    location: "Austin, TX",
-    count: 0,
-    courtCount: "2 courts",
-    detail: "Outdoor · public & free",
-    players: [],
-    localCount: 0,
-    isLocal: false,
-    activity: "No public check-ins yet",
-  },
-  {
-    id: "austin-pickleball-pan-am",
-    sportId: "pickleball",
-    name: "Pan American Pickleball Courts",
-    sport: "Pickleball",
-    status: "Austin launch court",
-    location: "Austin, TX",
-    count: 0,
-    courtCount: "6 courts",
-    detail: "Outdoor · public & free",
-    players: [],
-    localCount: 0,
-    isLocal: false,
-    activity: "No public check-ins yet",
-  },
-];
+import type { ExplorerCourt } from "./courts/supabase-courts";
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -82,96 +32,29 @@ function Brand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function CourtCard({ court }: { court: Court }) {
-  const [checkedIn, setCheckedIn] = useState(false);
-  const SportIcon = court.sportId === "basketball" ? Basketball : PingPong;
-  const count = court.count + (checkedIn ? 1 : 0);
-
-  return (
-    <article className={`court-card court-card--${court.sportId}`} data-testid={`court-card-${court.sportId}`}>
-      <div className={`court-card__sport-art court-card__sport-art--${court.sportId}`} aria-hidden="true">
-        <span className="court-lines__boundary" />
-        {court.sportId === "basketball" ? (
-          <>
-            <span className="court-lines__arc" />
-            <span className="court-lines__key" />
-            <span className="court-lines__circle" />
-            <span className="court-lines__rim" />
-          </>
-        ) : (
-          <>
-            <span className="court-lines__net" />
-            <span className="court-lines__kitchen court-lines__kitchen--left" />
-            <span className="court-lines__kitchen court-lines__kitchen--right" />
-            <span className="court-lines__center court-lines__center--left" />
-            <span className="court-lines__center court-lines__center--right" />
-          </>
-        )}
-      </div>
-      <div className="court-card__shade" aria-hidden="true" />
-
-      <div className="court-card__content">
-        <div className="court-card__topline">
-          <span className="sport-label">
-            <span className="sport-label__icon"><SportIcon size={16} weight="fill" /></span>
-            {court.sport}
-          </span>
-          {court.isLocal ? (
-            <span className="local-court-label"><House size={14} weight="fill" /> Your local court</span>
-          ) : (
-            <span className="distance-label">{court.status}</span>
-          )}
-        </div>
-
-        <div className="court-card__main">
-          <h3>{court.name}</h3>
-          <div className="court-card__location">
-            <MapPin size={15} weight="fill" />
-            <span>{court.location}</span>
-            <span className="meta-dot" />
-            <span>{court.status}</span>
-          </div>
-          <p>{court.courtCount} <span>·</span> {court.detail}</p>
-        </div>
-
-        <div className="court-card__activity" aria-label={`${count} live now and ${court.localCount} locals`}>
-          <div className="activity-metric activity-metric--live">
-            <span className="activity-metric__signal"><i /></span>
-            <strong>{count}</strong>
-            <span><b>Live now</b><small>{checkedIn ? "You are checked in" : court.activity}</small></span>
-          </div>
-          <div className="activity-metric activity-metric--locals">
-            <div className="player-stack" aria-hidden="true">
-              {court.players.map((initials, index) => (
-                <span key={initials} style={{ zIndex: court.players.length - index }}>{initials}</span>
-              ))}
-            </div>
-            <strong>{court.localCount}</strong>
-            <span><b>Locals</b><small>Call this home</small></span>
-          </div>
-        </div>
-
-        <div className="court-card__actions">
-          <button
-            className={`button button--check${checkedIn ? " is-checked" : ""}`}
-            type="button"
-            onClick={() => setCheckedIn((value) => !value)}
-            aria-pressed={checkedIn}
-            data-testid={`check-in-${court.sportId}`}
-          >
-            {checkedIn ? <Check size={17} weight="bold" /> : null}
-            {checkedIn ? "Checked in" : "Check in"}
-          </button>
-          <Link className="button button--view" href={`/courts/${court.id}`} data-testid={`view-court-${court.sportId}`}>
-            View court <ArrowRight size={17} weight="bold" />
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
+function CourtCard({ court }: { court: ExplorerCourt }) {
+  const SportIcon = court.sport === "basketball" ? Basketball : PingPong;
+  return <article className={`court-card court-card--${court.sport}`}>
+    <div className="court-card__content">
+      <div className="court-card__topline"><span className="sport-label"><SportIcon size={18} />{court.sport}</span></div>
+      <div className="court-card__main"><h3>{court.name}</h3><p>{[court.city, court.state].filter(Boolean).join(", ")}</p><p>{court.courtCount ? `${court.courtCount} courts · ` : ""}{court.setting.replaceAll("_", " ")}</p></div>
+      <div className="court-card__actions"><Link className="button button--view" href={`/courts/${court.slug}`}>View court <ArrowRight size={17} /></Link></div>
+    </div>
+  </article>;
 }
 
 export default function Home() {
+  const [courts, setCourts] = useState<ExplorerCourt[]>([]);
+  const [courtState, setCourtState] = useState("loading");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/courts", { signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error("Courts unavailable");
+      const result = await response.json();
+      setCourts(result.courts); setCourtState("ready");
+    }).catch(() => { if (!controller.signal.aborted) setCourtState("error"); });
+    return () => controller.abort();
+  }, []);
   const heroRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState("");
@@ -220,11 +103,11 @@ export default function Home() {
         <header className="site-header">
           <Brand />
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/courts">Find games</Link>
+            <Link href="/courts">Find courts</Link>
             <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
             <button type="button" onClick={() => scrollTo("#about")}>About</button>
             <button type="button" onClick={() => setNotice("Login opens in the LocalCheck app.")}>Log in</button>
-            <button className="nav-cta" type="button" onClick={() => scrollTo("#courts")}>Check in</button>
+            <button className="nav-cta" type="button" onClick={() => scrollTo("#courts")}>Explore courts</button>
           </nav>
           <button className="menu-button" type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-label="Open navigation">
             {menuOpen ? <X size={25} /> : <List size={27} />}
@@ -233,7 +116,7 @@ export default function Home() {
 
         {menuOpen ? (
           <nav className="mobile-nav" aria-label="Mobile navigation">
-            <Link href="/courts" onClick={() => setMenuOpen(false)}>Find games</Link>
+            <Link href="/courts" onClick={() => setMenuOpen(false)}>Find courts</Link>
             <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
             <button type="button" onClick={() => scrollTo("#about")}>About</button>
             <button type="button" onClick={() => { setNotice("Login opens in the LocalCheck app."); setMenuOpen(false); }}>Log in</button>
@@ -241,30 +124,21 @@ export default function Home() {
         ) : null}
 
         <div className="hero__copy">
-          <span className="hero__eyebrow"><i /> Seven cities now mapped</span>
+          <span className="hero__eyebrow"><i /> Basketball & pickleball · Houston and Austin pilots</span>
           <h1>Find<br />your<br />run<span>.</span></h1>
           <p>Live courts. Real competition.</p>
           <div className="hero__actions">
             <Link className="button button--hero" href="/courts">
-              Explore 56 courts <ArrowRight size={19} weight="bold" />
+              Explore courts <ArrowRight size={19} weight="bold" />
             </Link>
             <button className="text-button" type="button" onClick={() => scrollTo("#how")}>See how it works <CaretRight size={17} weight="bold" /></button>
           </div>
         </div>
 
-        <div className="hero__signal" aria-label="LocalCheck launch court summary">
-          <span><strong>56</strong> launch courts</span>
-          <i />
-          <span><strong>28</strong> basketball</span>
-          <i />
-          <span><strong>28</strong> pickleball</span>
+        <div className="hero__signal" aria-live="polite">
+          <span>{courtState === "ready" ? `${courts.length} public courts on LocalCheck` : "Find a court. Bring your people."}</span>
         </div>
-
-        <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
-          <span>Scan to preview the app</span>
-          <img src="/qr-localcheck.png" alt="QR code for LocalCheck" width="78" height="78" />
-          <ArrowUpRight size={17} weight="bold" />
-        </a>
+        <a className="qr-card" href="mailto:localchecksports@gmail.com?subject=LocalCheck%20pilot"><span>Join the iPhone pilot</span><ArrowUpRight size={20} /></a>
       </section>
 
       <section className="live-courts section" id="courts">
@@ -273,18 +147,14 @@ export default function Home() {
             <span className="eyebrow eyebrow--orange">Launch court preview</span>
             <h2>Know before<br />you go.</h2>
           </div>
-          <p>One court card, everywhere. The map starts with verified venue identity and access; live and local counts stay honest as the community checks in.</p>
+          <p>Browse the same public court listings as the LocalCheck app. Check in, arrange a game, and meet your local players in the app.</p>
         </div>
 
         <div className="court-grid">
-          {courts.map((court) => <CourtCard court={court} key={court.id} />)}
+          {courts.slice(0, 2).map((court) => <CourtCard court={court} key={court.id} />)}
+          {courtState !== "ready" ? <p role="status">{courtState === "error" ? "Court listings are temporarily unavailable. Please try again shortly." : "Loading court listings…"}</p> : courts.length === 0 ? <p>No public courts are listed yet.</p> : null}
         </div>
 
-        <div className="card-legend" aria-label="Court card design details">
-          <span><i className="legend-dot" /> Orange always means live</span>
-          <span><UsersThree size={17} /> Counts start at zero—not fabricated</span>
-          <span><CornersOut size={17} /> Court geometry distinguishes each sport</span>
-        </div>
       </section>
 
       <section className="how section" id="how">
@@ -298,19 +168,19 @@ export default function Home() {
             <span>01</span>
             <div className="step-icon"><MapPin size={27} weight="fill" /></div>
             <h3>Find the run</h3>
-            <p>Browse nearby basketball and pickleball courts by real activity—not stale reviews.</p>
+            <p>Explore nearby basketball and pickleball courts. Choose a home court to follow your local community.</p>
           </article>
           <article>
             <span>02</span>
             <div className="step-icon"><Check size={27} weight="bold" /></div>
             <h3>Check in</h3>
-            <p>One tap tells your local community the court is active and keeps the live picture honest.</p>
+            <p>Check in when you arrive. In-app activity helps other players decide when to join; it is not a guarantee that a court is occupied.</p>
           </article>
           <article>
             <span>03</span>
             <div className="step-icon"><Clock size={27} weight="fill" /></div>
             <h3>Plan the week</h3>
-            <p>Mark when you are coming, see who else is in, and let the next run organize itself.</p>
+            <p>Schedule a game or join a run in the app. Coordinate with other players before heading out.</p>
           </article>
         </div>
       </section>
@@ -323,38 +193,25 @@ export default function Home() {
             <p>Log games, build a real local ranking, and see the people who make your home court what it is.</p>
             <button className="text-button text-button--light" type="button" onClick={() => setNotice("Competition profiles are coming in the LocalCheck app.")}>Explore competition <ArrowRight size={18} weight="bold" /></button>
           </div>
-          <div className="rank-card" aria-label="Sample local leaderboard">
-            <header><span>East Austin · Basketball</span><strong>Local ranking</strong></header>
-            {[
-              ["01", "JM", "Jordan Miles", "1284", "+18"],
-              ["02", "AR", "Alex Rivera", "1251", "+7"],
-              ["03", "TK", "Taylor Kim", "1219", "+11"],
-              ["04", "MC", "Morgan Chen", "1188", "—"],
-            ].map((row, index) => (
-              <div className={index === 0 ? "is-current" : ""} key={row[0]}>
-                <span className="rank-number">{row[0]}</span>
-                <span className="rank-avatar">{row[1]}</span>
-                <strong>{row[2]}</strong>
-                <span className="rank-score">{row[3]}</span>
-                <small>{row[4]}</small>
-              </div>
-            ))}
-            <footer><span>Updated after every ranked game</span><ArrowUpRight size={17} /></footer>
+          <div className="rank-card">
+            <header><span>After the game</span><strong>Make the result count</strong></header>
+            <p style={{padding: "1.5rem"}}>Record your game, review the score with the other players, and follow your progress. Resolve score disagreements in the app before a result is settled.</p>
+            <footer><span>Player profiles and rankings are in the app</span><ArrowUpRight size={17} /></footer>
           </div>
         </div>
       </section>
 
       <section className="final-cta section">
-        <span className="eyebrow eyebrow--orange">The launch map is ready</span>
+        <span className="eyebrow eyebrow--orange">Start with your local court</span>
         <h2>Find your run<span>.</span></h2>
-        <p>Browse the first 56 source-backed basketball and pickleball courts.</p>
+        <p>We are piloting with basketball and pickleball players in Houston and Austin. Email us to join the iPhone pilot.</p>
         <Link className="button button--hero" href="/courts">Explore courts <ArrowRight size={19} weight="bold" /></Link>
       </section>
 
       <footer className="site-footer">
         <Brand compact />
         <p>Live courts. Real competition.</p>
-        <div><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><a href="#top">Back to top</a><span>© 2026 LocalCheck</span></div>
+        <div><Link href="/terms">Terms</Link><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><a href="#top">Back to top</a><span>© 2026 LocalCheck</span></div>
       </footer>
 
       {notice ? <div className="toast" role="status">{notice}</div> : null}
