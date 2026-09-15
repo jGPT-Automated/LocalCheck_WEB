@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import CourtPageClient from "./court-page-client";
 import type { CourtDetail } from "./court-data";
 import { loadExplorerCourt } from "../supabase-courts";
+import { SITE_URL } from "../../../lib/site";
 
 async function getMapboxToken() {
   try {
@@ -12,11 +14,47 @@ async function getMapboxToken() {
   }
 }
 
-export default async function CourtPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const lookupId = id === "basketball"
+function resolveLookupId(id: string) {
+  return id === "basketball"
     ? "austin-basketball-hancock"
     : id === "pickleball" ? "austin-pickleball-pan-am" : id;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await loadExplorerCourt(resolveLookupId(id));
+  if (!listing) return {};
+
+  const location = [listing.city, listing.state].filter(Boolean).join(", ");
+  const description = [
+    `${listing.name} — ${listing.sport} court${listing.courtCount ? ` (${listing.courtCount} ${listing.courtCount === 1 ? "court" : "courts"})` : ""}`,
+    location,
+    "See live check-ins, setup, and access details on LocalCheck.",
+  ]
+    .filter(Boolean)
+    .join(". ");
+
+  return {
+    title: `${listing.name} — LocalCheck`,
+    description,
+    // Canonicalize alias slugs (e.g. /courts/basketball) to the real slug so
+    // duplicate URLs never split ranking signals.
+    alternates: { canonical: `/courts/${listing.slug}` },
+    openGraph: {
+      title: `${listing.name} — LocalCheck`,
+      description,
+      url: `${SITE_URL}/courts/${listing.slug}`,
+    },
+  };
+}
+
+export default async function CourtPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const lookupId = resolveLookupId(id);
   let court: CourtDetail | undefined;
 
   if (!court) {

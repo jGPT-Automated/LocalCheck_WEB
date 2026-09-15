@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../lib/site";
 import "@fontsource-variable/inter";
 import "@fontsource/oswald/500.css";
 import "@fontsource/oswald/600.css";
@@ -7,7 +8,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://localchecksports.com"),
+  metadataBase: new URL(SITE_URL),
   title: "LocalCheck — Find Your Run",
   description: "Find live basketball and pickleball courts, see who is playing, and check in with one tap.",
   icons: {

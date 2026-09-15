@@ -5,6 +5,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy — LocalCheck",
   description: "How LocalCheck collects, uses, shares, and protects information.",
+  alternates: { canonical: "/privacy" },
 };
 
 const sections = [
