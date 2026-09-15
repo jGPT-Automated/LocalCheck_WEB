@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CourtPageClient from "./court-page-client";
@@ -20,13 +21,17 @@ function resolveLookupId(id: string) {
     : id === "pickleball" ? "austin-pickleball-pan-am" : id;
 }
 
+// generateMetadata and the page share one cached lookup so a single request
+// performs at most one court fetch.
+const loadCourt = cache((id: string) => loadExplorerCourt(id));
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const listing = await loadExplorerCourt(resolveLookupId(id));
+  const listing = await loadCourt(resolveLookupId(id));
   if (!listing) return {};
 
   const location = [listing.city, listing.state].filter(Boolean).join(", ");
@@ -48,6 +53,21 @@ export async function generateMetadata({
       title: `${listing.name} — LocalCheck`,
       description,
       url: `${SITE_URL}/courts/${listing.slug}`,
+      images: [
+        {
+          url: "/localcheck-logo-final-preview.png",
+          width: 5160,
+          height: 808,
+          alt: listing.name,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${listing.name} — LocalCheck`,
+      description,
+      images: ["/localcheck-logo-final-preview.png"],
     },
   };
 }
@@ -58,7 +78,7 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
   let court: CourtDetail | undefined;
 
   if (!court) {
-    const listing = await loadExplorerCourt(lookupId);
+    const listing = await loadCourt(lookupId);
     if (listing) {
       const setting = listing.setting
         ? listing.setting.replaceAll("_", " ").replace(/^./, (value) => value.toUpperCase())
