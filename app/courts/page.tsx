@@ -5,6 +5,7 @@ import { launchCourts } from "./supabase-courts";
 export const metadata: Metadata = {
   title: "Find a Court — LocalCheck",
   description: "Explore live basketball and pickleball courts on the LocalCheck map.",
+  alternates: { canonical: "/courts" },
 };
 
 async function getMapboxToken() {
