@@ -6,7 +6,7 @@ import { SITE_URL } from "../lib/site";
  * Sitemap generated from the same court data layer the deployed pages use.
  *
  * `loadExplorerCourts()` reads Supabase when configured and falls back to the
- * bundled curated catalog (`data/launch-courts.json`, 56 courts) otherwise.
+ * bundled curated catalog (`data/launch-courts.json`) otherwise.
  * Reusing it keeps the URL set in sync as venues are added — no duplicated
  * queries and no hardcoded slugs. API routes and machine-readable
  * (.json/.txt) endpoints are intentionally excluded.

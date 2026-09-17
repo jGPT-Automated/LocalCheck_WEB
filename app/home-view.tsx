@@ -18,6 +18,8 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
+import type { CourtDataResult } from "./courts/supabase-courts";
 
 type Sport = "basketball" | "pickleball";
 
@@ -171,10 +173,43 @@ function CourtCard({ court }: { court: Court }) {
   );
 }
 
-export default function HomeView() {
+export default function HomeView({ stats }: { stats: CourtStats }) {
   const heroRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState("");
+  const [counts, setCounts] = useState<CourtStats>(stats);
+
+  /* Server-rendered counts are authoritative. This refresh mirrors the
+     `/courts` explorer: if Supabase has newer data than the build, the
+     homepage numbers correct themselves instead of showing a stale total.
+     Same deriveCourtStats() as the server render, so both paths agree. */
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 2600);
+
+    const refresh = async () => {
+      try {
+        const response = await fetch("/api/courts", { signal: controller.signal });
+        if (!response.ok) return;
+        const result = await response.json() as Partial<CourtDataResult>;
+        /* Only trust a real database read; a curated fallback is what the
+           server render already used, so re-deriving it can only go backwards. */
+        if (result.source === "supabase" && result.courts?.length) {
+          setCounts(deriveCourtStats(result.courts));
+        }
+      } catch {
+        // Server-rendered counts stay correct; refresh is optional.
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    };
+
+    void refresh();
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, []);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -241,23 +276,23 @@ export default function HomeView() {
         ) : null}
 
         <div className="hero__copy">
-          <span className="hero__eyebrow"><i /> Seven cities now mapped</span>
+          <span className="hero__eyebrow"><i /> {counts.markets} cities now mapped</span>
           <h1>Find<br />your<br />run<span>.</span></h1>
           <p>Live courts. Real competition.</p>
           <div className="hero__actions">
             <Link className="button button--hero" href="/courts">
-              Explore 56 courts <ArrowRight size={19} weight="bold" />
+              Explore {counts.total} courts <ArrowRight size={19} weight="bold" />
             </Link>
             <button className="text-button" type="button" onClick={() => scrollTo("#how")}>See how it works <CaretRight size={17} weight="bold" /></button>
           </div>
         </div>
 
         <div className="hero__signal" aria-label="LocalCheck launch court summary">
-          <span><strong>56</strong> launch courts</span>
+          <span><strong>{counts.total}</strong> launch courts</span>
           <i />
-          <span><strong>28</strong> basketball</span>
+          <span><strong>{counts.basketball}</strong> basketball</span>
           <i />
-          <span><strong>28</strong> pickleball</span>
+          <span><strong>{counts.pickleball}</strong> pickleball</span>
         </div>
 
         <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
@@ -347,7 +382,7 @@ export default function HomeView() {
       <section className="final-cta section">
         <span className="eyebrow eyebrow--orange">The launch map is ready</span>
         <h2>Find your run<span>.</span></h2>
-        <p>Browse the first 56 source-backed basketball and pickleball courts.</p>
+        <p>Browse the first {counts.total.toLocaleString()} source-backed basketball and pickleball courts.</p>
         <Link className="button button--hero" href="/courts">Explore courts <ArrowRight size={19} weight="bold" /></Link>
       </section>
 

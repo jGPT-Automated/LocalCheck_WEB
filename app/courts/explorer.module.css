@@ -101,6 +101,10 @@
   display: grid;
   height: calc(100svh - 82px);
   grid-template-columns: minmax(350px, 410px) minmax(0, 1fr);
+  /* The shell never scrolls; only the court list does. Without this the
+     sidebar's content height propagates into the grid row and stretches the
+     map panel to the full list height, which renders a black canvas. */
+  overflow: hidden;
 }
 
 .sidebar {
@@ -108,6 +112,10 @@
   z-index: 8;
   display: flex;
   min-width: 0;
+  /* Grid/flex items default to min-height:auto, so the column refuses to
+     shrink below its content and the inner list never gets to scroll. */
+  min-height: 0;
+  overflow: hidden;
   flex-direction: column;
   border-right: 1px solid rgba(242, 242, 246, 0.1);
   background:
@@ -575,6 +583,12 @@
   font-size: 9px;
 }
 
+/* Mobile-only drag surface. Hidden on desktop, where it would otherwise be a
+   zero-height focusable tab stop that does nothing. */
+.sheetHandle {
+  display: none;
+}
+
 .mapPanel {
   position: relative;
   min-width: 0;
@@ -876,15 +890,24 @@
 }
 
 @media (max-width: 760px) {
+  /* The page never scrolls on mobile. The map is pinned full-bleed and the
+     court list lives in a bottom sheet that slides over it — scrolling the
+     list can never carry the map out of view. */
   .page {
-    height: auto;
-    min-height: 100svh;
-    overflow: visible;
+    --sheet-peek: 158px;
+    --sheet-full-sliver: 96px;
+    display: flex;
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
+    flex-direction: column;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   .nav {
-    position: sticky;
-    top: 0;
+    position: relative;
+    flex: 0 0 auto;
     height: 72px;
     padding: 0 18px;
   }
@@ -900,32 +923,107 @@
   }
 
   .shell {
-    display: flex;
+    position: relative;
+    display: block;
     height: auto;
-    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
+  /* The sidebar becomes the bottom sheet. One element, three detents, driven
+     by --sheet-ty so a drag can follow the finger without fighting CSS.
+     Height is 100% of the shell (not viewport units) so it can never exceed
+     its own container and clip the grabber. */
   .sidebar {
-    display: contents;
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    border-right: 0;
+    border-top: 1px solid rgba(242, 242, 246, 0.14);
+    border-radius: 20px 20px 0 0;
+    background: #121216;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
+    transform: translateY(var(--sheet-ty, calc(100% - var(--sheet-peek))));
+    transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+  }
+
+  .sidebarDragging {
+    transition: none;
+  }
+
+  .sheetPeek {
+    --sheet-ty: calc(100% - var(--sheet-peek));
+  }
+
+  .sheetHalf {
+    --sheet-ty: calc(100% - 55dvh);
+  }
+
+  /* Full leaves a map sliver above the sheet so the map stays in context. */
+  .sheetFull {
+    --sheet-ty: var(--sheet-full-sliver);
+  }
+
+  /* Native <button> so Enter/Space work without a hand-rolled key handler;
+     resets undo the UA button chrome. */
+  .sheetHandle {
+    display: grid;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 22px;
+    place-items: center;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .sheetHandle:active {
+    cursor: grabbing;
+  }
+
+  .sheetHandle:focus-visible {
+    outline: 2px solid #f5c451;
+    outline-offset: -3px;
+  }
+
+  .sheetGrabber {
+    width: 42px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(242, 242, 246, 0.34);
   }
 
   .sidebarHeader {
-    order: 1;
-    padding: 23px 18px 15px;
+    flex: 0 0 auto;
+    padding: 4px 18px 15px;
     background: #121216;
   }
 
   .mapPanel {
-    order: 2;
-    height: 49svh;
-    min-height: 380px;
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    height: auto;
+    min-height: 0;
   }
 
   .courtList {
-    order: 3;
+    flex: 1 1 auto;
+    min-height: 0;
     max-height: none;
-    overflow: visible;
-    padding: 14px 13px 36px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 14px 13px calc(20px + env(safe-area-inset-bottom, 0px));
     background: #121216;
   }
 
@@ -949,28 +1047,107 @@
     margin-top: 13px;
   }
 
+  /* How much of the sheet is visible, per detent. Map overlays read this so
+     nothing they draw is ever covered by the sheet. */
+  .shell[data-detent="peek"] {
+    --sheet-visible: var(--sheet-peek);
+  }
+
+  .shell[data-detent="half"] {
+    --sheet-visible: 55dvh;
+  }
+
+  .shell[data-detent="full"] {
+    --sheet-visible: calc(100% - var(--sheet-full-sliver));
+  }
+
+  /* At the full detent the sheet covers the map, so the floating selection
+     card has nowhere to sit and the list itself shows the selection. */
+  .shell[data-detent="full"] .mapSelection {
+    display: none;
+  }
+
   .mapSelection {
     right: 12px;
-    bottom: 12px;
+    bottom: calc(var(--sheet-visible, var(--sheet-peek)) + 12px);
     left: 12px;
     width: auto;
   }
 
+  /* Both map controls stay above the sheet at every detent, so the sheet can
+     never cover them. The zoom control owns the top-right corner. */
   .legend {
-    top: 14px;
+    top: 64px;
     right: auto;
     bottom: auto;
     left: 14px;
   }
 
   .fitButton {
-    top: auto;
-    bottom: 14px;
+    top: 14px;
+    bottom: auto;
     left: 14px;
   }
 
-  .mapSelection + .legend {
+  /* The selection card covers the same corner as the legend; hide the legend
+     while a selection is open. Both are siblings under .mapPanel with the
+     legend first, so :has() looks forward to the selection. */
+  .legend:has(~ .mapSelection) {
     display: none;
+  }
+
+  /* Compact browse rows: the point of the sheet is to see the map and several
+     courts at once, so the card carries identity and location, not every tag.
+     No content-visibility here — it skips offscreen subtrees, which makes
+     scrollIntoView land wrong and withholds cards from the aria-live list. */
+  .courtCard {
+    min-height: 0;
+    padding: 12px 13px;
+    border-radius: 13px;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+  }
+
+  .courtCard:hover,
+  .courtCard.selected {
+    transform: none;
+  }
+
+  .courtCard.selected::after {
+    top: 10px;
+    bottom: 10px;
+  }
+
+  .sportLabel,
+  .verified {
+    font-size: 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .courtCard h2 {
+    margin: 7px 0 0;
+    font-size: 17px;
+  }
+
+  .canonicalName {
+    display: none;
+  }
+
+  .location {
+    margin: 5px 0 0;
+    font-size: 8px;
+  }
+
+  .setup {
+    display: none;
+  }
+
+  .cardFooter {
+    margin-top: 9px;
+    padding-top: 8px;
+  }
+
+  .metrics {
+    gap: 11px;
   }
 }
 
@@ -982,14 +1159,6 @@
 
   .titleRow h1 {
     font-size: 39px;
-  }
-
-  .mapPanel {
-    min-height: 350px;
-  }
-
-  .courtCard {
-    min-height: 184px;
   }
 
   .mapSelection > div {

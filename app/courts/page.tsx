@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CourtExplorerClient from "./court-explorer-client";
-import { launchCourts } from "./supabase-courts";
+import { loadExplorerCourts } from "./supabase-courts";
 
 export const metadata: Metadata = {
   title: "Find a Court — LocalCheck",
@@ -18,15 +18,15 @@ async function getMapboxToken() {
 }
 
 export default async function CourtsPage() {
-  // Render the source-backed launch set immediately. A bounded client-side
-  // refresh swaps in the same catalog with live Supabase counters.
-  const mapboxToken = await getMapboxToken();
+  // Same data layer the sitemap and homepage use, so the rendered court set
+  // and the URLs in sitemap.xml can never disagree about which venues exist.
+  const [mapboxToken, courtData] = await Promise.all([getMapboxToken(), loadExplorerCourts()]);
 
   return (
     <CourtExplorerClient
-      initialCourts={launchCourts}
+      initialCourts={courtData.courts}
       mapboxToken={mapboxToken}
-      source="curated"
+      source={courtData.source}
     />
   );
 }
