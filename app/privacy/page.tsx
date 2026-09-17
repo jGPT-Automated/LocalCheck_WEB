@@ -88,7 +88,7 @@ export default function PrivacyPolicy() {
             <ul>
               <li><strong>Account and profile information.</strong> Your name, email address, user identifier, sign-in provider, and profile details.</li>
               <li><strong>Court and activity information.</strong> Court submissions, check-ins, local-court selections, planned visits, verification results, and other activity you choose to share through LocalCheck.</li>
-              <li><strong>Photos.</strong> Photos you take or select when submitting a court for verification. The submitted image is sent through our backend to Google Gemini for analysis. The current verification flow does not retain the image after that analysis.</li>
+              <li><strong>Photos.</strong> Photos you capture live with your camera inside LocalCheck when submitting a court for verification. The verification flow accepts live camera captures only — it does not accept images selected or uploaded from your photo library. The submitted image is sent through our backend to Google Gemini for analysis. The current verification flow does not retain the image after that analysis.</li>
               <li><strong>Communications.</strong> Information you include when you contact us for support or privacy questions.</li>
             </ul>
             <h3>Information collected when you use LocalCheck</h3>
