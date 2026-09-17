@@ -18,13 +18,8 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-
-export type HomeStats = {
-  total: number;
-  basketball: number;
-  pickleball: number;
-  markets: number;
-};
+import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
+import type { CourtDataResult } from "./courts/supabase-courts";
 
 type Sport = "basketball" | "pickleball";
 
@@ -178,15 +173,16 @@ function CourtCard({ court }: { court: Court }) {
   );
 }
 
-export default function HomeView({ stats }: { stats: HomeStats }) {
+export default function HomeView({ stats }: { stats: CourtStats }) {
   const heroRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState("");
-  const [counts, setCounts] = useState<HomeStats>(stats);
+  const [counts, setCounts] = useState<CourtStats>(stats);
 
   /* Server-rendered counts are authoritative. This refresh mirrors the
      `/courts` explorer: if Supabase has newer data than the build, the
-     homepage numbers correct themselves instead of showing a stale total. */
+     homepage numbers correct themselves instead of showing a stale total.
+     Same deriveCourtStats() as the server render, so both paths agree. */
   useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 2600);
@@ -195,17 +191,11 @@ export default function HomeView({ stats }: { stats: HomeStats }) {
       try {
         const response = await fetch("/api/courts", { signal: controller.signal });
         if (!response.ok) return;
-        const result = await response.json() as {
-          courts?: Array<{ sport?: string; market?: string }>;
-          source?: string;
-        };
+        const result = await response.json() as Partial<CourtDataResult>;
+        /* Only trust a real database read; a curated fallback is what the
+           server render already used, so re-deriving it can only go backwards. */
         if (result.source === "supabase" && result.courts?.length) {
-          setCounts({
-            total: result.courts.length,
-            basketball: result.courts.filter((court) => court.sport === "basketball").length,
-            pickleball: result.courts.filter((court) => court.sport === "pickleball").length,
-            markets: new Set(result.courts.map((court) => court.market).filter(Boolean)).size,
-          });
+          setCounts(deriveCourtStats(result.courts));
         }
       } catch {
         // Server-rendered counts stay correct; refresh is optional.
@@ -392,7 +382,7 @@ export default function HomeView({ stats }: { stats: HomeStats }) {
       <section className="final-cta section">
         <span className="eyebrow eyebrow--orange">The launch map is ready</span>
         <h2>Find your run<span>.</span></h2>
-        <p>Browse the first 56 source-backed basketball and pickleball courts.</p>
+        <p>Browse the first {counts.total.toLocaleString()} source-backed basketball and pickleball courts.</p>
         <Link className="button button--hero" href="/courts">Explore courts <ArrowRight size={19} weight="bold" /></Link>
       </section>
 

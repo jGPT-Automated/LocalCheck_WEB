@@ -583,6 +583,12 @@
   font-size: 9px;
 }
 
+/* Mobile-only drag surface. Hidden on desktop, where it would otherwise be a
+   zero-height focusable tab stop that does nothing. */
+.sheetHandle {
+  display: none;
+}
+
 .mapPanel {
   position: relative;
   min-width: 0;
@@ -965,18 +971,29 @@
     --sheet-ty: var(--sheet-full-sliver);
   }
 
+  /* Native <button> so Enter/Space work without a hand-rolled key handler;
+     resets undo the UA button chrome. */
   .sheetHandle {
     display: grid;
     flex: 0 0 auto;
+    width: 100%;
     height: 22px;
     place-items: center;
     cursor: grab;
     touch-action: none;
     user-select: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
   }
 
   .sheetHandle:active {
     cursor: grabbing;
+  }
+
+  .sheetHandle:focus-visible {
+    outline: 2px solid #f5c451;
+    outline-offset: -3px;
   }
 
   .sheetGrabber {
@@ -1006,7 +1023,7 @@
     max-height: none;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 14px 13px calc(20px + env(safe-area-inset-bottom));
+    padding: 14px 13px calc(20px + env(safe-area-inset-bottom, 0px));
     background: #121216;
   }
 
@@ -1072,19 +1089,22 @@
     left: 14px;
   }
 
-  .mapSelection + .legend {
+  /* The selection card covers the same corner as the legend; hide the legend
+     while a selection is open. Both are siblings under .mapPanel with the
+     legend first, so :has() looks forward to the selection. */
+  .legend:has(~ .mapSelection) {
     display: none;
   }
 
   /* Compact browse rows: the point of the sheet is to see the map and several
-     courts at once, so the card carries identity and location, not every tag. */
+     courts at once, so the card carries identity and location, not every tag.
+     No content-visibility here — it skips offscreen subtrees, which makes
+     scrollIntoView land wrong and withholds cards from the aria-live list. */
   .courtCard {
     min-height: 0;
     padding: 12px 13px;
     border-radius: 13px;
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
-    content-visibility: auto;
-    contain-intrinsic-size: auto 96px;
   }
 
   .courtCard:hover,

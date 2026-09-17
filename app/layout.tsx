@@ -50,7 +50,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           `viewportFit`, so the Next-style `viewport` export cannot produce
           this. Without `viewport-fit=cover`, every `env(safe-area-inset-*)`
           resolves to 0 on notched iPhones and the last court card sits under
-          the home indicator. Declared after the generated tag so it wins.
+          the home indicator.
+
+          Ordering matters: this must stay AFTER the generated viewport tag,
+          because current Blink/WebKit/Firefox honour the last one inserted.
+          Two viewport tags are non-conformant, and a UA that honoured the
+          first would silently drop viewport-fit — degrading to today's
+          behaviour, not breaking the page.
         */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>

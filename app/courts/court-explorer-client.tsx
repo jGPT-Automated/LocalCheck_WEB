@@ -115,27 +115,40 @@ function CourtListCard({
 
 type SheetDetent = "peek" | "half" | "full";
 
-/** Mobile sheet snap points, as visible sheet height in px (half is viewport-relative). */
+/**
+ * Mobile sheet detents as visible sheet height in px. These mirror the CSS
+ * detents in explorer.module.css (--sheet-peek / --sheet-full-sliver / 55dvh),
+ * so the drag snap points and the rendered positions agree.
+ */
 const SHEET_PEAK_PX = 158;
-
-function isMobileSheetViewport() {
-  return typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
-}
+const SHEET_FULL_SLIVER_PX = 96;
+const SHEET_HALF_RATIO = 0.55;
 
 /**
  * Bottom padding for camera moves, so markers never hide behind the sheet.
+ * Measured against the map container itself: the map spans the shell, which is
+ * the viewport minus the 72px nav, so window.innerHeight overestimates it.
  * On desktop the sidebar is a separate column and needs no compensation.
  */
-function mapBottomPadding(detent: SheetDetent) {
-  if (!isMobileSheetViewport()) return 100;
-  const viewportHeight = window.innerHeight;
-  const sheetHeight =
+function mapBottomPadding(detent: SheetDetent, container: HTMLElement | null) {
+  if (!container) return 100;
+  const view = container.ownerDocument.defaultView;
+  if (!view?.matchMedia("(max-width: 760px)").matches) return 100;
+
+  const mapHeight = container.getBoundingClientRect().height;
+  if (!mapHeight) return 100;
+
+  const sheetVisible =
     detent === "peek"
       ? SHEET_PEAK_PX
       : detent === "half"
-        ? viewportHeight * 0.55
-        : viewportHeight * 0.92;
-  return Math.min(sheetHeight + 24, Math.round(viewportHeight * 0.72));
+        ? Math.round(view.innerHeight * SHEET_HALF_RATIO)
+        : Math.max(mapHeight - SHEET_FULL_SLIVER_PX, SHEET_PEAK_PX);
+
+  /* Mapbox refuses to fit when padding approaches the canvas size, so the
+     compensation stays well under the map height. At the full detent only a
+     sliver of map shows, so an exact fit there is not meaningful anyway. */
+  return Math.min(sheetVisible + 24, Math.round(mapHeight * 0.8));
 }
 
 export default function CourtExplorerClient({ initialCourts, mapboxToken, source }: Props) {
@@ -176,10 +189,24 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
    * list keeps scrolling natively and there is no scroll-vs-drag ambiguity.
    * The sheet never dismisses fully — it always rests on a detent.
    */
+  /* True only while the sheet layout is active, so the drag listeners attach
+     and detach as the viewport crosses the breakpoint. */
+  const [isSheetViewport, setIsSheetViewport] = useState(false);
+
   useEffect(() => {
-    if (!isMobileSheetViewport()) return;
+    const query = window.matchMedia("(max-width: 760px)");
+    const sync = () => setIsSheetViewport(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!isSheetViewport) return;
     const sheet = sheetRef.current;
     if (!sheet) return;
+    const handle = sheet.querySelector<HTMLElement>("[data-sheet-handle]");
+    if (!handle) return;
 
     const sheetHeight = () => sheet.getBoundingClientRect().height || window.innerHeight * 0.92;
     const maxTy = () => Math.max(sheetHeight() - 60, 0);
@@ -193,6 +220,12 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
       return matrix.m42 || 0;
     };
 
+    const resetDrag = () => {
+      dragRef.current = { pointerId: 0, startY: 0, startTy: 0, lastY: 0, lastTime: 0, velocity: 0, moved: false };
+      setDragging(false);
+      sheet.style.removeProperty("--sheet-ty");
+    };
+
     const onPointerDown = (event: PointerEvent) => {
       const now = performance.now();
       dragRef.current = {
@@ -204,8 +237,15 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
         velocity: 0,
         moved: false,
       };
+      /* A drag release also fires click on the handle; clear any stale
+         suppression so this gesture decides its own. */
+      suppressHandleClick.current = false;
       setDragging(true);
-      sheet.setPointerCapture(event.pointerId);
+      /* Capture MUST be set on the element that holds the move/up listeners.
+         Capturing on the sheet instead retargets every later pointer event —
+         including click — to the sheet, and since bubbling runs upward from
+         there the handle's own listeners never fire. */
+      handle.setPointerCapture(event.pointerId);
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -225,6 +265,9 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     const onPointerUp = (event: PointerEvent) => {
       const drag = dragRef.current;
       if (drag.pointerId !== event.pointerId) return;
+      if (handle.hasPointerCapture(event.pointerId)) {
+        handle.releasePointerCapture(event.pointerId);
+      }
       setDragging(false);
       /* Only a real drag suppresses the follow-up click; a tap should still
          cycle the detent through the handle's onClick. */
@@ -240,8 +283,8 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
       const projected = visible + flick;
       const stops: Array<{ detent: SheetDetent; visibleHeight: number }> = [
         { detent: "peek", visibleHeight: SHEET_PEAK_PX },
-        { detent: "half", visibleHeight: window.innerHeight * 0.55 },
-        { detent: "full", visibleHeight: height },
+        { detent: "half", visibleHeight: Math.round(window.innerHeight * SHEET_HALF_RATIO) },
+        { detent: "full", visibleHeight: height - SHEET_FULL_SLIVER_PX },
       ];
       const nearest = stops.reduce((best, stop) =>
         Math.abs(stop.visibleHeight - projected) < Math.abs(best.visibleHeight - projected) ? stop : best,
@@ -251,18 +294,23 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
       dragRef.current = { pointerId: 0, startY: 0, startTy: 0, lastY: 0, lastTime: 0, velocity: 0, moved: false };
     };
 
-    const handle = sheet.querySelector<HTMLElement>("[data-sheet-handle]");
-    handle?.addEventListener("pointerdown", onPointerDown);
-    handle?.addEventListener("pointermove", onPointerMove);
-    handle?.addEventListener("pointerup", onPointerUp);
-    handle?.addEventListener("pointercancel", onPointerUp);
+    handle.addEventListener("pointerdown", onPointerDown);
+    handle.addEventListener("pointermove", onPointerMove);
+    handle.addEventListener("pointerup", onPointerUp);
+    /* Cancel means interrupted (browser takeover, system gesture), not
+       finished — revert to the current detent rather than snapping to one. */
+    handle.addEventListener("pointercancel", resetDrag);
+    /* The pointer can be lost without an up event (browser takeover, window
+       blur); without this, `dragging` sticks true and freezes the transition. */
+    handle.addEventListener("lostpointercapture", resetDrag);
     return () => {
-      handle?.removeEventListener("pointerdown", onPointerDown);
-      handle?.removeEventListener("pointermove", onPointerMove);
-      handle?.removeEventListener("pointerup", onPointerUp);
-      handle?.removeEventListener("pointercancel", onPointerUp);
+      handle.removeEventListener("pointerdown", onPointerDown);
+      handle.removeEventListener("pointermove", onPointerMove);
+      handle.removeEventListener("pointerup", onPointerUp);
+      handle.removeEventListener("pointercancel", resetDrag);
+      handle.removeEventListener("lostpointercapture", resetDrag);
     };
-  }, [detent]);
+  }, [isSheetViewport]);
 
   const filteredCourts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -416,7 +464,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             const bounds = new mapboxgl.LngLatBounds();
             initialCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
             map.fitBounds(bounds, {
-              padding: { top: 110, right: 90, bottom: mapBottomPadding(detentRef.current), left: 90 },
+              padding: { top: 110, right: 90, bottom: mapBottomPadding(detentRef.current, containerRef.current), left: 90 },
               retainPadding: false,
               maxZoom: 11.7,
               duration: 0,
@@ -451,7 +499,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
       const bounds = new mapboxgl.LngLatBounds();
       filteredCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
       map.fitBounds(bounds, {
-        padding: { top: 80, right: 80, bottom: mapBottomPadding(detentRef.current), left: 80 },
+        padding: { top: 80, right: 80, bottom: mapBottomPadding(detentRef.current, containerRef.current), left: 80 },
         retainPadding: false,
         maxZoom: 12.5,
         duration: 520,
@@ -469,7 +517,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     const bounds = new mapboxgl.LngLatBounds();
     filteredCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
     map.fitBounds(bounds, {
-      padding: { top: 80, right: 80, bottom: mapBottomPadding(detent), left: 80 },
+      padding: { top: 80, right: 80, bottom: mapBottomPadding(detent, containerRef.current), left: 80 },
       retainPadding: false,
       maxZoom: 12.5,
       duration: 380,
@@ -501,7 +549,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     mapRef.current?.easeTo({
       center: [court.longitude, court.latitude],
       zoom: Math.max(mapRef.current.getZoom(), 13),
-      padding: { top: 0, right: 0, bottom: mapBottomPadding(detentRef.current), left: 0 },
+      padding: { top: 0, right: 0, bottom: mapBottomPadding(detentRef.current, containerRef.current), left: 0 },
       retainPadding: false,
       duration: 620,
     });
@@ -512,7 +560,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     const bounds = new mapboxRef.current.LngLatBounds();
     filteredCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
     mapRef.current.fitBounds(bounds, {
-      padding: { top: 90, right: 90, bottom: mapBottomPadding(detentRef.current), left: 90 },
+      padding: { top: 90, right: 90, bottom: mapBottomPadding(detentRef.current, containerRef.current), left: 90 },
       retainPadding: false,
       maxZoom: 12.5,
       duration: 650,
@@ -538,12 +586,12 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
           className={`${styles.sidebar} ${styles[detent === "peek" ? "sheetPeek" : detent === "half" ? "sheetHalf" : "sheetFull"]}${dragging ? ` ${styles.sidebarDragging}` : ""}`}
           ref={sheetRef}
         >
-          <div
+          <button
             className={styles.sheetHandle}
             data-sheet-handle
-            role="button"
-            tabIndex={0}
-            aria-label="Resize court list"
+            type="button"
+            aria-label={`Court list, ${detent === "peek" ? "collapsed" : detent === "half" ? "half open" : "fully open"}. Activate to resize.`}
+            aria-expanded={detent !== "peek"}
             onClick={() => {
               if (suppressHandleClick.current) {
                 suppressHandleClick.current = false;
@@ -553,7 +601,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             }}
           >
             <i className={styles.sheetGrabber} aria-hidden="true" />
-          </div>
+          </button>
           <div className={styles.sidebarHeader}>
             <span className={styles.eyebrow}><i /> Find your run</span>
             <div className={styles.titleRow}>
@@ -577,7 +625,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
               <label className={styles.marketFilter}>
                 <span>City</span>
                 <select value={market} onChange={(event) => setMarket(event.target.value)} aria-label="Filter by city">
-                  <option value="all">All 7 launch cities</option>
+                  <option value="all">All {markets.length} launch cities</option>
                   {markets.map((value) => <option value={value} key={value}>{value}</option>)}
                 </select>
               </label>
