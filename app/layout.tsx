@@ -44,6 +44,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        {/*
+          vinext's viewport shim emits width/height/scale only and drops
+          `viewportFit`, so the Next-style `viewport` export cannot produce
+          this. Without `viewport-fit=cover`, every `env(safe-area-inset-*)`
+          resolves to 0 on notched iPhones and the last court card sits under
+          the home indicator. Declared after the generated tag so it wins.
+        */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
       <body>{children}</body>
     </html>
   );

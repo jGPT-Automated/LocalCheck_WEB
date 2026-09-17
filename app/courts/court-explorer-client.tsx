@@ -113,6 +113,31 @@ function CourtListCard({
   );
 }
 
+type SheetDetent = "peek" | "half" | "full";
+
+/** Mobile sheet snap points, as visible sheet height in px (half is viewport-relative). */
+const SHEET_PEAK_PX = 158;
+
+function isMobileSheetViewport() {
+  return typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
+}
+
+/**
+ * Bottom padding for camera moves, so markers never hide behind the sheet.
+ * On desktop the sidebar is a separate column and needs no compensation.
+ */
+function mapBottomPadding(detent: SheetDetent) {
+  if (!isMobileSheetViewport()) return 100;
+  const viewportHeight = window.innerHeight;
+  const sheetHeight =
+    detent === "peek"
+      ? SHEET_PEAK_PX
+      : detent === "half"
+        ? viewportHeight * 0.55
+        : viewportHeight * 0.92;
+  return Math.min(sheetHeight + 24, Math.round(viewportHeight * 0.72));
+}
+
 export default function CourtExplorerClient({ initialCourts, mapboxToken, source }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("mapbox-gl").Map | null>(null);
@@ -126,11 +151,118 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [detent, setDetent] = useState<SheetDetent>("peek");
+  const [dragging, setDragging] = useState(false);
+  const sheetRef = useRef<HTMLElement>(null);
+  const dragRef = useRef({ pointerId: 0, startY: 0, startTy: 0, lastY: 0, lastTime: 0, velocity: 0, moved: false });
+  /** A drag release also fires click on the handle; swallow that one click. */
+  const suppressHandleClick = useRef(false);
+  /** Imperative camera calls read this; kept in sync outside render. */
+  const detentRef = useRef<SheetDetent>("peek");
+
+  /* Keeps the imperative camera calls (selectCourt, resetMap, initial fit)
+     reading the current detent without mutating a ref during render. */
+  useEffect(() => {
+    detentRef.current = detent;
+  }, [detent]);
 
   const markets = useMemo(
     () => Array.from(new Set(courts.map((court) => court.market).filter(Boolean))).sort(),
     [courts],
   );
+
+  /**
+   * Pointer-driven sheet drag. The handle is the only drag surface, so the
+   * list keeps scrolling natively and there is no scroll-vs-drag ambiguity.
+   * The sheet never dismisses fully — it always rests on a detent.
+   */
+  useEffect(() => {
+    if (!isMobileSheetViewport()) return;
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+
+    const sheetHeight = () => sheet.getBoundingClientRect().height || window.innerHeight * 0.92;
+    const maxTy = () => Math.max(sheetHeight() - 60, 0);
+
+    const currentTy = () => {
+      const transform = getComputedStyle(sheet).transform;
+      if (!transform || transform === "none") {
+        return Math.max(sheetHeight() - SHEET_PEAK_PX, 0);
+      }
+      const matrix = new DOMMatrixReadOnly(transform);
+      return matrix.m42 || 0;
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      const now = performance.now();
+      dragRef.current = {
+        pointerId: event.pointerId,
+        startY: event.clientY,
+        startTy: currentTy(),
+        lastY: event.clientY,
+        lastTime: now,
+        velocity: 0,
+        moved: false,
+      };
+      setDragging(true);
+      sheet.setPointerCapture(event.pointerId);
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      const drag = dragRef.current;
+      if (drag.pointerId !== event.pointerId) return;
+      const now = performance.now();
+      const elapsed = now - drag.lastTime;
+      if (elapsed > 0) drag.velocity = (event.clientY - drag.lastY) / elapsed;
+      drag.lastY = event.clientY;
+      drag.lastTime = now;
+      const delta = event.clientY - drag.startY;
+      if (Math.abs(delta) > 6) drag.moved = true;
+      const next = Math.min(Math.max(drag.startTy + delta, 0), maxTy());
+      sheet.style.setProperty("--sheet-ty", `${next}px`);
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      const drag = dragRef.current;
+      if (drag.pointerId !== event.pointerId) return;
+      setDragging(false);
+      /* Only a real drag suppresses the follow-up click; a tap should still
+         cycle the detent through the handle's onClick. */
+      suppressHandleClick.current = drag.moved;
+      if (!drag.moved) {
+        sheet.style.removeProperty("--sheet-ty");
+        dragRef.current = { pointerId: 0, startY: 0, startTy: 0, lastY: 0, lastTime: 0, velocity: 0, moved: false };
+        return;
+      }
+      const height = sheetHeight();
+      const visible = height - (drag.startTy + (event.clientY - drag.startY));
+      const flick = drag.velocity * 220;
+      const projected = visible + flick;
+      const stops: Array<{ detent: SheetDetent; visibleHeight: number }> = [
+        { detent: "peek", visibleHeight: SHEET_PEAK_PX },
+        { detent: "half", visibleHeight: window.innerHeight * 0.55 },
+        { detent: "full", visibleHeight: height },
+      ];
+      const nearest = stops.reduce((best, stop) =>
+        Math.abs(stop.visibleHeight - projected) < Math.abs(best.visibleHeight - projected) ? stop : best,
+      );
+      sheet.style.removeProperty("--sheet-ty");
+      setDetent(nearest.detent);
+      dragRef.current = { pointerId: 0, startY: 0, startTy: 0, lastY: 0, lastTime: 0, velocity: 0, moved: false };
+    };
+
+    const handle = sheet.querySelector<HTMLElement>("[data-sheet-handle]");
+    handle?.addEventListener("pointerdown", onPointerDown);
+    handle?.addEventListener("pointermove", onPointerMove);
+    handle?.addEventListener("pointerup", onPointerUp);
+    handle?.addEventListener("pointercancel", onPointerUp);
+    return () => {
+      handle?.removeEventListener("pointerdown", onPointerDown);
+      handle?.removeEventListener("pointermove", onPointerMove);
+      handle?.removeEventListener("pointerup", onPointerUp);
+      handle?.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, [detent]);
 
   const filteredCourts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -283,7 +415,12 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
           if (initialCourts.length > 1) {
             const bounds = new mapboxgl.LngLatBounds();
             initialCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
-            map.fitBounds(bounds, { padding: { top: 110, right: 90, bottom: 100, left: 90 }, maxZoom: 11.7, duration: 0 });
+            map.fitBounds(bounds, {
+              padding: { top: 110, right: 90, bottom: mapBottomPadding(detentRef.current), left: 90 },
+              retainPadding: false,
+              maxZoom: 11.7,
+              duration: 0,
+            });
           } else if (initialCourts[0]) {
             map.jumpTo({ center: [initialCourts[0].longitude, initialCourts[0].latitude], zoom: 12.5 });
           }
@@ -313,9 +450,31 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     if (map && mapboxgl && filteredCourts.length) {
       const bounds = new mapboxgl.LngLatBounds();
       filteredCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
-      map.fitBounds(bounds, { padding: 80, maxZoom: 12.5, duration: 520 });
+      map.fitBounds(bounds, {
+        padding: { top: 80, right: 80, bottom: mapBottomPadding(detentRef.current), left: 80 },
+        retainPadding: false,
+        maxZoom: 12.5,
+        duration: 520,
+      });
     }
   }, [filteredCourts, mapState]);
+
+  /* The sheet covers the bottom of the map on mobile, so the camera re-fits
+     whenever the detent changes and markers stay in the visible region. */
+  useEffect(() => {
+    if (mapState !== "ready") return;
+    const map = mapRef.current;
+    const mapboxgl = mapboxRef.current;
+    if (!map || !mapboxgl || !filteredCourts.length || selectedId) return;
+    const bounds = new mapboxgl.LngLatBounds();
+    filteredCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
+    map.fitBounds(bounds, {
+      padding: { top: 80, right: 80, bottom: mapBottomPadding(detent), left: 80 },
+      retainPadding: false,
+      maxZoom: 12.5,
+      duration: 380,
+    });
+  }, [detent, filteredCourts, mapState, selectedId]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -342,6 +501,8 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     mapRef.current?.easeTo({
       center: [court.longitude, court.latitude],
       zoom: Math.max(mapRef.current.getZoom(), 13),
+      padding: { top: 0, right: 0, bottom: mapBottomPadding(detentRef.current), left: 0 },
+      retainPadding: false,
       duration: 620,
     });
   };
@@ -350,7 +511,12 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
     if (!mapRef.current || !mapboxRef.current || !filteredCourts.length) return;
     const bounds = new mapboxRef.current.LngLatBounds();
     filteredCourts.forEach((court) => bounds.extend([court.longitude, court.latitude]));
-    mapRef.current.fitBounds(bounds, { padding: 90, maxZoom: 12.5, duration: 650 });
+    mapRef.current.fitBounds(bounds, {
+      padding: { top: 90, right: 90, bottom: mapBottomPadding(detentRef.current), left: 90 },
+      retainPadding: false,
+      maxZoom: 12.5,
+      duration: 650,
+    });
   };
 
   return (
@@ -367,8 +533,27 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
         <Link className={styles.back} href="/"><ArrowLeft size={16} weight="bold" /> Back home</Link>
       </header>
 
-      <div className={styles.shell}>
-        <aside className={styles.sidebar}>
+      <div className={styles.shell} data-detent={detent}>
+        <aside
+          className={`${styles.sidebar} ${styles[detent === "peek" ? "sheetPeek" : detent === "half" ? "sheetHalf" : "sheetFull"]}${dragging ? ` ${styles.sidebarDragging}` : ""}`}
+          ref={sheetRef}
+        >
+          <div
+            className={styles.sheetHandle}
+            data-sheet-handle
+            role="button"
+            tabIndex={0}
+            aria-label="Resize court list"
+            onClick={() => {
+              if (suppressHandleClick.current) {
+                suppressHandleClick.current = false;
+                return;
+              }
+              setDetent((value) => (value === "peek" ? "half" : value === "half" ? "full" : "peek"));
+            }}
+          >
+            <i className={styles.sheetGrabber} aria-hidden="true" />
+          </div>
           <div className={styles.sidebarHeader}>
             <span className={styles.eyebrow}><i /> Find your run</span>
             <div className={styles.titleRow}>
