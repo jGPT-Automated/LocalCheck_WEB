@@ -354,7 +354,7 @@ export default function HomeView() {
       <footer className="site-footer">
         <Brand compact />
         <p>Live courts. Real competition.</p>
-        <div><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><a href="#top">Back to top</a><span>© 2026 LocalCheck</span></div>
+        <div><Link href="/pioneers">Pioneers</Link><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><a href="#top">Back to top</a><span>© 2026 LocalCheck</span></div>
       </footer>
 
       {notice ? <div className="toast" role="status">{notice}</div> : null}
