@@ -2,15 +2,6 @@ import type { MetadataRoute } from "next";
 import { loadExplorerCourts } from "./courts/supabase-courts";
 import { SITE_URL } from "../lib/site";
 
-/**
- * Sitemap generated from the same court data layer the deployed pages use.
- *
- * `loadExplorerCourts()` reads Supabase when configured and falls back to the
- * bundled curated catalog (`data/launch-courts.json`) otherwise.
- * Reusing it keeps the URL set in sync as venues are added — no duplicated
- * queries and no hardcoded slugs. API routes and machine-readable
- * (.json/.txt) endpoints are intentionally excluded.
- */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { courts } = await loadExplorerCourts();
 
@@ -30,10 +21,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
+    { url: `${SITE_URL}/how-it-works`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/courts`, changeFrequency: "weekly", priority: 0.9 },
     ...courtEntries,
     { url: `${SITE_URL}/support`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/pioneers`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.3 },
   ];
 }

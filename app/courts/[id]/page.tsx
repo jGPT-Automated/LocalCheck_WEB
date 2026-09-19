@@ -5,6 +5,7 @@ import CourtPageClient from "./court-page-client";
 import type { CourtDetail } from "./court-data";
 import { loadExplorerCourt } from "../supabase-courts";
 import { SITE_URL } from "../../../lib/site";
+import { breadcrumbSchema, courtSchema, jsonLd } from "../../../lib/structured-data";
 
 async function getMapboxToken() {
   try {
@@ -75,50 +76,67 @@ export async function generateMetadata({
 export default async function CourtPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const lookupId = resolveLookupId(id);
+
+  const listing = await loadCourt(lookupId);
   let court: CourtDetail | undefined;
 
-  if (!court) {
-    const listing = await loadCourt(lookupId);
-    if (listing) {
-      const setting = listing.setting
-        ? listing.setting.replaceAll("_", " ").replace(/^./, (value) => value.toUpperCase())
-        : listing.indoor === true ? "Indoor" : listing.indoor === false ? "Outdoor" : "Not listed";
-      const access = listing.accessType === "private_paid"
-        ? "Private · paid"
-        : listing.accessType === "public_paid" ? "Public · fees may apply" : "Public · free";
-      court = {
-        id: listing.id,
-        name: listing.name,
-        sport: listing.sport === "pickleball" ? "Pickleball" : "Basketball",
-        address: [listing.address, listing.city, listing.state].filter(Boolean).join(", "),
-        neighborhood: [listing.city, listing.state].filter(Boolean).join(", ") || "Local court",
-        distance: "Map listing",
-        coordinates: [listing.longitude, listing.latitude],
-        liveCount: listing.liveCount ?? 0,
-        localCount: listing.localCount ?? 0,
-        isLocal: false,
-        liveNote: listing.liveCount ? "Players checked in" : "No public check-ins yet",
-        peakWindow: "Weekly intent builds as locals make plans",
-        details: [
-          { label: "Setup", value: listing.courtCount ? `${listing.courtCount} ${listing.courtCount === 1 ? "court" : "courts"}` : "Not listed" },
-          { label: "Access", value: access },
-          { label: "Setting", value: setting },
-          { label: "Status", value: listing.verified ? "Source verified" : "Needs review" },
-        ],
-        players: [],
-        schedule: [],
-        activity: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      } satisfies CourtDetail;
-    }
+  if (listing) {
+    const setting = listing.setting
+      ? listing.setting.replaceAll("_", " ").replace(/^./, (value) => value.toUpperCase())
+      : listing.indoor === true ? "Indoor" : listing.indoor === false ? "Outdoor" : "Not listed";
+    const access = listing.accessType === "private_paid"
+      ? "Private · paid"
+      : listing.accessType === "public_paid" ? "Public · fees may apply" : "Public · free";
+    court = {
+      id: listing.id,
+      name: listing.name,
+      sport: listing.sport === "pickleball" ? "Pickleball" : "Basketball",
+      address: [listing.address, listing.city, listing.state].filter(Boolean).join(", "),
+      neighborhood: [listing.city, listing.state].filter(Boolean).join(", ") || "Local court",
+      distance: "Map listing",
+      coordinates: [listing.longitude, listing.latitude],
+      liveCount: listing.liveCount ?? 0,
+      localCount: listing.localCount ?? 0,
+      isLocal: false,
+      liveNote: listing.liveCount ? "Players checked in" : "No public check-ins yet",
+      peakWindow: "Weekly intent builds as locals make plans",
+      details: [
+        { label: "Setup", value: listing.courtCount ? `${listing.courtCount} ${listing.courtCount === 1 ? "court" : "courts"}` : "Not listed" },
+        { label: "Access", value: access },
+        { label: "Setting", value: setting },
+        { label: "Status", value: listing.verified ? "Source verified" : "Needs review" },
+      ],
+      players: [],
+      schedule: [],
+      activity: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    } satisfies CourtDetail;
   }
 
-  if (!court) notFound();
+  if (!court || !listing) notFound();
 
   return (
-    <CourtPageClient
-      court={court}
-      mapboxToken={await getMapboxToken()}
-      todayIso={new Date().toISOString().slice(0, 10)}
-    />
+    <>
+      {/*
+        SportsActivityLocation + BreadcrumbList. This is what lets an
+        assistant answer "where can I play pickleball in {city}" with this
+        specific court instead of a guess. Built from live Supabase data.
+      */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(courtSchema(listing))} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          breadcrumbSchema([
+            { name: "LocalCheck", path: "/" },
+            { name: "Courts", path: "/courts" },
+            { name: listing.name, path: `/courts/${listing.slug}` },
+          ]),
+        )}
+      />
+      <CourtPageClient
+        court={court}
+        mapboxToken={await getMapboxToken()}
+        todayIso={new Date().toISOString().slice(0, 10)}
+      />
+    </>
   );
 }
