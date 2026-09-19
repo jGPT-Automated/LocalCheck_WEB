@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "../lib/site";
-import { jsonLd, siteGraph } from "../lib/structured-data";
+import { jsonLd, siteNodes } from "../lib/structured-data";
 import "@fontsource-variable/inter";
 import "@fontsource/oswald/500.css";
 import "@fontsource/oswald/600.css";
@@ -84,10 +84,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/*
           Sitewide JSON-LD: Organization + WebSite (with SearchAction) +
-          MobileApplication. Court-level SportsActivityLocation is emitted
-          per court in app/courts/[id]/page.tsx.
+          MobileApplication, as separate self-describing tags rather than one
+          @graph — see lib/structured-data.ts for why. Court-level
+          SportsActivityLocation is emitted per court in
+          app/courts/[id]/page.tsx.
         */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(siteGraph())} />
+        {siteNodes().map((node) => (
+          <script
+            key={String(node["@type"])}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={jsonLd(node)}
+          />
+        ))}
       </head>
       <body>{children}</body>
     </html>

@@ -66,12 +66,23 @@ export function mobileAppSchema() {
   };
 }
 
-/** Sitewide graph — rendered once in the root layout. */
-export function siteGraph() {
-  return {
-    "@context": "https://schema.org",
-    "@graph": [organizationSchema(), websiteSchema(), mobileAppSchema()],
-  };
+/**
+ * Sitewide nodes — rendered as SEPARATE <script> tags in the root layout.
+ *
+ * Deliberately not a single `@graph` block. A graph wrapper has no top-level
+ * `@type`, so any consumer that reads `data["@type"]` without walking
+ * `@graph` sees nothing at all. That is not hypothetical: it is exactly how
+ * a plain JSON-LD reader behaves, and we hit it in testing. Emitting one
+ * self-describing node per tag is equally valid schema.org and degrades
+ * gracefully for naive parsers — which is most of the long tail of AI
+ * crawlers. Cross-references between nodes still work via @id.
+ */
+export function siteNodes() {
+  return [
+    { "@context": "https://schema.org", ...organizationSchema() },
+    { "@context": "https://schema.org", ...websiteSchema() },
+    { "@context": "https://schema.org", ...mobileAppSchema() },
+  ];
 }
 
 const SPORT_LABEL: Record<string, string> = {
