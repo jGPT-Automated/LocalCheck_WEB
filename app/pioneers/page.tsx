@@ -1,16 +1,17 @@
-import { ArrowLeft, Camera, Check, CornersOut, EnvelopeSimple, MapPin, UsersThree } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft, ArrowRight, Camera, Check, CornersOut, MapPin, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Local Pioneers — LocalCheck",
   description:
-    "Become a Local Pioneer: verify your court with a live photo, earn LocalPlus, and leave your name in that court's permanent history.",
+    "Join LocalCheck at launch. The first 100 Starters get a year of LocalPlus; Pioneers grow a court community and earn a year for themselves and a month for their invites.",
   alternates: { canonical: "/pioneers" },
   openGraph: {
     title: "Local Pioneers — LocalCheck",
     description:
-      "Become a Local Pioneer: verify your court with a live photo, earn LocalPlus, and leave your name in that court's permanent history.",
+      "The first 100 Starters get a year of LocalPlus. Add a court and bring five weekly players to become a Pioneer.",
     url: "/pioneers",
     siteName: "LocalCheck",
     images: [
@@ -27,14 +28,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Local Pioneers — LocalCheck",
     description:
-      "Become a Local Pioneer: verify your court with a live photo, earn LocalPlus, and leave your name in that court's permanent history.",
+      "The first 100 Starters get a year of LocalPlus. Add a court and bring five weekly players to become a Pioneer.",
     images: ["/localcheck-logo-final-preview.png"],
   },
 };
 
 const sections = [
   ["how", "How to become a Pioneer"],
-  ["rewards", "The reward ladder"],
+  ["rewards", "Launch offers"],
   ["why", "Why it matters"],
   ["faq", "FAQ"],
   ["join", "Get involved"],
@@ -61,21 +62,15 @@ const steps = [
 const rewards = [
   {
     mark: "01",
-    title: "Verify a court",
-    reward: "+3 months of LocalPlus",
-    body: "Confirm a court that is not on the map yet and you unlock three months of LocalPlus for yourself — plus your name on that court's history for good.",
+    title: "Starters",
+    reward: "One free year of LocalPlus",
+    body: "The first 100 people to download and join LocalCheck get a free year of LocalPlus. You do not need to add a court to be a Starter.",
   },
   {
     mark: "02",
-    title: "Bring players",
-    reward: "+1 month per player you bring",
-    body: "Every player you bring who checks in on 7 different days earns you another month. That is the part that matters: a record on a map is easy, a court with real regulars is the whole point.",
-  },
-  {
-    mark: "03",
-    title: "Become a Legend",
-    reward: "1 year of LocalPlus + the Legend emblem",
-    body: "Get 5 of your players checking in weekly for a month and that court is running on its own. You keep the Legend emblem on your profile box — whether you stay paid or drop back to free.",
+    title: "Pioneers",
+    reward: "One free year for you · one free month for each invite",
+    body: "Add a court, then bring five invited players who each check in at least once a week for four weeks. You earn a free year of LocalPlus, and each of your invites gets one month of LocalPlus free on sign-up.",
   },
 ] as const;
 
@@ -86,7 +81,11 @@ const faqs = [
   },
   {
     q: "Can I verify a court that's already listed?",
-    a: "The Local Pioneer recognition goes to the person who first verifies a court that isn't on the map yet. If a court is already listed, you can still use it, check in, and help keep its activity picture accurate — but the pioneer credit for that court has already been claimed.",
+    a: "You can use, check in at, and help organize an already listed court. To qualify for the Pioneer launch offer, add a court that is not yet on the map and bring five invited players who each check in weekly for four weeks.",
+  },
+  {
+    q: "How do I become a Starter?",
+    a: "Be one of the first 100 people to download and join LocalCheck. Starters receive one free year of LocalPlus.",
   },
   {
     q: "How do you prevent fake courts?",
@@ -123,6 +122,27 @@ function PioneersBrand() {
   );
 }
 
+function PioneerCourtArt() {
+  return (
+    <div className="pioneers-court-art" data-court-art="basketball" aria-hidden="true">
+      <svg viewBox="0 0 600 820" fill="none" role="presentation">
+        <rect className="pioneers-court-art__boundary" x="36" y="36" width="528" height="748" rx="4" />
+        <path className="pioneers-court-art__line" d="M36 410h528" />
+        <circle className="pioneers-court-art__line" cx="300" cy="410" r="74" />
+        <path className="pioneers-court-art__line" d="M219 36v166h162V36M219 784V618h162v166" />
+        <circle className="pioneers-court-art__line" cx="300" cy="202" r="52" />
+        <circle className="pioneers-court-art__line" cx="300" cy="618" r="52" />
+        <path className="pioneers-court-art__line" d="M144 36v92c0 87 70 158 156 158s156-71 156-158V36M144 784v-92c0-87 70-158 156-158s156 71 156 158v92" />
+        <circle className="pioneers-court-art__rim" cx="300" cy="91" r="9" />
+        <circle className="pioneers-court-art__rim" cx="300" cy="729" r="9" />
+        <path className="pioneers-court-art__route" d="M118 663c53-44 87-89 171-95 83-5 146-65 168-122" />
+        <circle className="pioneers-court-art__route-end" cx="457" cy="446" r="10" />
+      </svg>
+      <span className="pioneers-court-art__caption">SHOW UP / BRING YOUR PEOPLE / KEEP PLAYING</span>
+    </div>
+  );
+}
+
 export default function PioneersPage() {
   return (
     <main className="legal-page" id="top">
@@ -139,36 +159,35 @@ export default function PioneersPage() {
       </header>
 
       <section className="legal-hero pioneers-hero" aria-labelledby="pioneers-title">
-        <div>
-          <span className="eyebrow eyebrow--orange">The Local Pioneers launch program</span>
+        <PioneerCourtArt />
+        <div className="pioneers-hero__copy">
+          <span className="eyebrow eyebrow--orange">Starters &amp; Pioneers · the launch programs</span>
           <h1 id="pioneers-title">
             Pioneer a court<span>.</span>
           </h1>
-          <p className="pioneers-tagline">Start something.</p>
+          <p className="pioneers-tagline">Make it a place to play.</p>
           <p className="legal-intro">
-            A Local Pioneer is the first person to verify a court on LocalCheck. You drop the pin,
-            take a live photo, and put that court on the map for everyone who plays there. Your name
-            stays attached to it — permanently. The court outlasts generations of players; the
-            record of who found it does not change.
+            Add the court that is missing. Bring five players who show up every week. Give your
+            community one place to find the next run.
           </p>
+          <div className="pioneers-hero__actions">
+            <a className="button button--hero" href="#how">How it works <ArrowRight size={18} weight="bold" /></a>
+            <a className="pioneers-hero__secondary" href="#rewards">See launch rewards</a>
+          </div>
         </div>
-        <div className="legal-meta" aria-label="Launch program details">
-          <p>
-            <span>What you do</span>
-            <strong>Verify a court with a live photo</strong>
-          </p>
-          <p>
-            <span>What you get</span>
-            <strong>LocalPlus, and a permanent place in the court&rsquo;s history</strong>
-          </p>
-          <p>
-            <span>Questions</span>
-            <strong>
-              <EnvelopeSimple size={16} weight="bold" aria-hidden="true" />{" "}
-              <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>
-            </strong>
-          </p>
-        </div>
+      </section>
+
+      <section className="pioneers-offer-strip" aria-label="Starter and Pioneer launch offers">
+        <article>
+          <span>01 / Starters</span>
+          <strong>100</strong>
+          <p>The first 100 people to download and join get one free year of LocalPlus.</p>
+        </article>
+        <article>
+          <span>02 / Pioneers</span>
+          <strong>5 × 4</strong>
+          <p>Add a court. Bring five invited players who each check in once a week for four weeks. You get a free year; they get a free month on sign-up.</p>
+        </article>
       </section>
 
       <div className="legal-layout">
@@ -187,30 +206,41 @@ export default function PioneersPage() {
         <article className="legal-copy">
           <section id="how">
             <span className="legal-section-number">01</span>
-            <h2>How to become a Local Pioneer</h2>
+            <h2>How to add your court</h2>
             <p>
               Adding a court should take seconds, not a form. The whole flow happens in the app,
               in the moment, standing at the court.
             </p>
-            <div className="pioneers-steps">
-              {steps.map((step, index) => (
-                <article className="pioneers-step" key={step.title}>
-                  <span className="pioneers-step__number">{String(index + 1).padStart(2, "0")}</span>
-                  <div className="pioneers-step__icon">{step.icon}</div>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
-                </article>
-              ))}
+            <div className="pioneers-flow">
+              <div className="pioneers-steps">
+                {steps.map((step, index) => (
+                  <article className="pioneers-step" key={step.title}>
+                    <span className="pioneers-step__number">{String(index + 1).padStart(2, "0")}</span>
+                    <div className="pioneers-step__icon">{step.icon}</div>
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.body}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <figure className="pioneers-flow__screen">
+                <Image src="/app-screens/add-court-start.png" alt="LocalCheck app screen showing the add-a-court flow" width={709} height={1536} unoptimized />
+                <figcaption>From the LocalCheck app / Add a court</figcaption>
+              </figure>
             </div>
+            <p>
+              Then invite five players. When each checks in at least once a week for four weeks,
+              you qualify as a Pioneer. Their first month of LocalPlus is free on sign-up.
+            </p>
           </section>
 
           <section id="rewards">
             <span className="legal-section-number">02</span>
-            <h2>The reward ladder</h2>
+            <h2>Two ways to start</h2>
             <p>
-              The launch program rewards two different things: putting a real court on the map, and
-              building a community that actually uses it. The further you take it, the more you
-              earn — capped by what you build, not by what you submit.
+              Starters make the first move. Pioneers build a place where other people keep showing up.
+              Both offers are built around participation, not a made-up points system.
             </p>
             <ol className="pioneers-rewards">
               {rewards.map((reward) => (
@@ -226,14 +256,9 @@ export default function PioneersPage() {
                 </li>
               ))}
             </ol>
-            <p>
-              <strong>Players you bring get a starting period of LocalPlus too</strong>, so the
-              first crew on a new court gets the full product together instead of half of it.
-            </p>
             <p className="pioneers-note">
-              Rewards go to genuinely useful additions, not raw submissions — that is what the live
-              photo and the rate limits are for. Launch program terms may be adjusted as the first
-              courts and communities come in.
+              Pioneer eligibility depends on a verified new court, five invited players, and each
+              player checking in at least once a week for four weeks.
             </p>
           </section>
 

@@ -364,18 +364,6 @@
   transform: translateY(-2px);
 }
 
-.courtCard.selected::after {
-  position: absolute;
-  top: 14px;
-  right: 0;
-  bottom: 14px;
-  width: 2px;
-  border-radius: 2px 0 0 2px;
-  background: #fc4c02;
-  box-shadow: 0 0 14px rgba(252, 76, 2, 0.65);
-  content: "";
-}
-
 .cardTarget {
   position: absolute;
   z-index: 1;
@@ -538,6 +526,10 @@
   color: #d3d3da;
   pointer-events: auto;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.cardLink span {
+  display: none;
 }
 
 .cardLink:hover {
@@ -963,7 +955,7 @@
   }
 
   .sheetHalf {
-    --sheet-ty: calc(100% - 55dvh);
+    --sheet-ty: calc(100% - 42dvh);
   }
 
   /* Full leaves a map sliver above the sheet so the map stays in context. */
@@ -1005,7 +997,7 @@
 
   .sidebarHeader {
     flex: 0 0 auto;
-    padding: 4px 18px 15px;
+    padding: 1px 18px 10px;
     background: #121216;
   }
 
@@ -1018,17 +1010,52 @@
   }
 
   .courtList {
+    display: grid;
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 14px 13px calc(20px + env(safe-area-inset-bottom, 0px));
+    grid-auto-columns: min(82vw, 350px);
+    grid-auto-flow: column;
+    align-items: start;
+    align-content: start;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 12px 15px calc(16px + env(safe-area-inset-bottom, 0px));
     background: #121216;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 15px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+
+  .courtList::-webkit-scrollbar {
+    display: none;
+  }
+
+  .eyebrow {
+    display: none;
+  }
+
+  .titleRow {
+    margin-top: 0;
   }
 
   .titleRow h1 {
-    font-size: 43px;
+    font-size: 32px;
+  }
+
+  .titleRow p {
+    max-width: 280px;
+    margin-top: 5px;
+    font-size: 9px;
+    line-height: 1.35;
+  }
+
+  .search {
+    min-height: 42px;
+    margin-top: 10px;
   }
 
   .mobileFilter {
@@ -1044,7 +1071,7 @@
   }
 
   .resultMeta {
-    margin-top: 13px;
+    margin-top: 9px;
   }
 
   /* How much of the sheet is visible, per detent. Map overlays read this so
@@ -1054,7 +1081,7 @@
   }
 
   .shell[data-detent="half"] {
-    --sheet-visible: 55dvh;
+    --sheet-visible: 42dvh;
   }
 
   .shell[data-detent="full"] {
@@ -1096,25 +1123,21 @@
     display: none;
   }
 
-  /* Compact browse rows: the point of the sheet is to see the map and several
-     courts at once, so the card carries identity and location, not every tag.
-     No content-visibility here — it skips offscreen subtrees, which makes
-     scrollIntoView land wrong and withholds cards from the aria-live list. */
+  /* One card is readable while the next card peeks in from the edge. That
+     visible continuation teaches the gesture without adding tutorial copy. */
   .courtCard {
-    min-height: 0;
-    padding: 12px 13px;
-    border-radius: 13px;
+    width: 100%;
+    min-height: 174px;
+    padding: 14px;
+    border-radius: 15px;
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
   }
 
   .courtCard:hover,
   .courtCard.selected {
     transform: none;
-  }
-
-  .courtCard.selected::after {
-    top: 10px;
-    bottom: 10px;
   }
 
   .sportLabel,
@@ -1124,12 +1147,12 @@
   }
 
   .courtCard h2 {
-    margin: 7px 0 0;
-    font-size: 17px;
+    margin: 9px 0 0;
+    font-size: 22px;
   }
 
   .canonicalName {
-    display: none;
+    display: block;
   }
 
   .location {
@@ -1138,7 +1161,7 @@
   }
 
   .setup {
-    display: none;
+    display: block;
   }
 
   .cardFooter {
@@ -1149,6 +1172,32 @@
   .metrics {
     gap: 11px;
   }
+
+  .cardLink {
+    display: inline-flex;
+    width: auto;
+    height: 36px;
+    gap: 7px;
+    padding: 0 11px;
+    border: 0;
+    border-radius: 7px;
+    background: #fc4c02;
+    color: #fff;
+  }
+
+  .cardLink span {
+    display: inline;
+    font-size: 7px;
+    font-weight: 760;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .listLimit,
+  .emptyState {
+    width: min(82vw, 350px);
+    scroll-snap-align: start;
+  }
 }
 
 @media (max-width: 460px) {
@@ -1158,7 +1207,7 @@
   }
 
   .titleRow h1 {
-    font-size: 39px;
+    font-size: 30px;
   }
 
   .mapSelection > div {

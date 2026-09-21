@@ -5,18 +5,18 @@ import { loadExplorerCourts } from "../courts/supabase-courts";
 import { deriveCourtStats } from "../../lib/court-stats";
 import { breadcrumbSchema, faqSchema, jsonLd } from "../../lib/structured-data";
 import type { FaqItem } from "../../lib/structured-data";
+import { COMMUNITY_PROMISE, PRODUCT_EXPLANATION, SITE_DESCRIPTION } from "../../lib/messaging";
 
 export const revalidate = 180;
 
 export const metadata: Metadata = {
-  title: "How LocalCheck Works — Heatmaps, Check-ins & Local Rankings",
-  description:
-    "LocalCheck shows when people actually plan to play at your local basketball and pickleball courts. See the weekly heatmap, check in at the court, log games, and build a real local ranking.",
+  title: "How LocalCheck Works | Heatmaps, Check-ins & Rankings",
+  description: SITE_DESCRIPTION,
   alternates: { canonical: "/how-it-works" },
   openGraph: {
     title: "How LocalCheck Works",
     description:
-      "The weekly heatmap, one-tap check-in, scheduled runs, local rankings, and AI-verified court submissions — explained.",
+      "The weekly heatmap, one-tap check-in, scheduled runs, friend, court, and regional rankings, and verified court submissions explained.",
     url: "/how-it-works",
     siteName: "LocalCheck",
     type: "website",
@@ -60,7 +60,7 @@ const faqs: readonly FaqItem[] = [
   {
     question: "How does the rating work?",
     answer:
-      "Logged games feed an ELO rating. Wins against stronger opponents move you more than wins against weaker ones. Ratings drive both the global leaderboard and your local court ranking.",
+      "Logged games feed an Elo rating. Wins against stronger opponents move you more than wins against weaker ones. That rating powers friend, court, and regional leaderboards.",
   },
   {
     question: "What if my opponent logs the wrong score?",
@@ -169,14 +169,13 @@ export default async function HowItWorksPage() {
             <span className="legal-section-number">01</span>
             <h2>What LocalCheck is</h2>
             <p>
-              LocalCheck answers one question the group text never could: is anyone actually going
-              to be at the court?
+              {COMMUNITY_PROMISE} {PRODUCT_EXPLANATION}
             </p>
             <p>
               Every other court app tells you a court exists. That was never the hard part. The hard
               part is knowing whether showing up at 6pm on a Tuesday means a run or an empty
               blacktop. LocalCheck turns that into a live, shared picture built by the people who
-              play there — {stats.total} source-backed basketball and pickleball courts across{" "}
+              play there. The launch set includes {stats.total} source-backed basketball and pickleball courts across{" "}
               {stats.markets} cities at launch.
             </p>
             <p>
@@ -188,7 +187,7 @@ export default async function HowItWorksPage() {
             <span className="legal-section-number">02</span>
             <h2>The short version</h2>
             <p>
-              <strong>Find the run.</strong> Browse nearby courts by real activity — not stale
+              <strong>Find the run.</strong> Browse nearby courts by real activity, not stale
               reviews. Map or list, filtered by sport.
             </p>
             <p>
@@ -206,7 +205,7 @@ export default async function HowItWorksPage() {
             <h2>The weekly heatmap</h2>
             <p>
               Each court has a seven-day grid broken out by hour. Cells get darker as more locals
-              mark that they are coming, so the week&apos;s rhythm becomes visible at a glance —
+              mark that they are coming, so the week&apos;s rhythm becomes visible at a glance:
               the Tuesday evening run, the Saturday morning regulars, the hours nobody plays.
             </p>
             <p>
@@ -224,7 +223,7 @@ export default async function HowItWorksPage() {
             <span className="legal-section-number">04</span>
             <h2>Checking in</h2>
             <p>
-              Check-in is geofenced — it only works when you are physically at the court. That
+              Check-in is geofenced, so it only works when you are physically at the court. That
               constraint is the whole point. It means a live count of three is three real people,
               not three optimistic taps from a couch.
             </p>
@@ -238,8 +237,8 @@ export default async function HowItWorksPage() {
             <span className="legal-section-number">05</span>
             <h2>Scheduled runs</h2>
             <p>
-              Beyond marking times, you can schedule an actual game — a 2v2 at a specific court and
-              hour — with a roster, invites to friends, and a going state other locals can see and
+              Beyond marking times, you can schedule an actual game: a 2v2 at a specific court and
+              hour with a roster, invites to friends, and a going state other locals can see and
               join.
             </p>
             <p>
@@ -252,8 +251,9 @@ export default async function HowItWorksPage() {
             <span className="legal-section-number">06</span>
             <h2>Games, ratings, and disputes</h2>
             <p>
-              Log a game with the sport, court, date, matchup, and score. Logged games feed an ELO
-              rating that drives both a global leaderboard and your standing at your home court.
+              Log a game with the sport, court, date, matchup, and score. Logged games feed an Elo
+              rating that powers three useful views: how you rank with friends, at each court, and
+              across your region.
             </p>
             <p>
               Scores are not self-reported into the void. Every submission goes to your opponent for
@@ -273,12 +273,13 @@ export default async function HowItWorksPage() {
             <h2>Locals and home courts</h2>
             <p>
               Set a court as your home court and you become one of its locals. Locals get a ranking
-              at that court, and the court gets an identity beyond its address — the people who
+              at that court, and the court gets an identity beyond its address: the people who
               actually make it what it is.
             </p>
             <p>
-              This is what the leaderboard is for. Not a global vanity score, but knowing where you
-              stand among the people you actually play against every week.
+              The friend view keeps the competition personal. Court rankings establish who leads
+              each local scene. Regional rankings give top players a reason to seek stronger games
+              beyond their usual run.
             </p>
           </section>
 

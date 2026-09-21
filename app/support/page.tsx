@@ -1,11 +1,17 @@
-import { ArrowLeft, Check, CornersOut, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft, Check, CornersOut, EnvelopeSimple, XLogo } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  COMMUNITY_PROMISE,
+  PRODUCT_EXPLANATION,
+  SUPPORT_EMAIL,
+  X_HANDLE,
+  X_URL,
+} from "@/lib/messaging";
 
 export const metadata: Metadata = {
-  title: "Support — LocalCheck",
-  description:
-    "Get help with LocalCheck. Contact our support team, report an issue, request a feature, or read answers to common questions about finding live basketball and pickleball courts near you.",
+  title: "Support | LocalCheck",
+  description: `${COMMUNITY_PROMISE} Get app help, report an issue, or share an idea.`,
   alternates: { canonical: "/support" },
 };
 
@@ -46,17 +52,16 @@ export default function SupportPage() {
             Support<span>.</span>
           </h1>
           <p className="legal-intro">
-            LocalCheck helps nearby basketball and pickleball players find and organize local runs.
-            Need help with the app, want to report a problem, or have an idea to make it better?
-            You&rsquo;re in the right place.
+            {COMMUNITY_PROMISE} {PRODUCT_EXPLANATION} Need app help, want to report a problem,
+            or have an idea? You&rsquo;re in the right place.
           </p>
         </div>
         <div className="legal-meta" aria-label="Support contact details">
           <p>
             <span>Email</span>
-            <strong>
-              <EnvelopeSimple size={16} weight="bold" aria-hidden="true" />{" "}
-              <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>
+            <strong className="legal-contact-inline">
+              <EnvelopeSimple size={16} weight="bold" aria-hidden="true" />
+              <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
             </strong>
           </p>
           <p>
@@ -64,8 +69,11 @@ export default function SupportPage() {
             <strong>We reply within 1 business day</strong>
           </p>
           <p>
-            <span>Operator</span>
-            <strong>Jesse Herrig</strong>
+            <span>X</span>
+            <strong className="legal-contact-inline">
+              <XLogo size={16} weight="bold" aria-hidden="true" />
+              <a href={X_URL} rel="noreferrer" target="_blank">{X_HANDLE}</a>
+            </strong>
           </p>
         </div>
       </section>
@@ -200,16 +208,22 @@ export default function SupportPage() {
                 <Link href="/privacy">Privacy Policy</Link>
               </li>
               <li>
-                <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>
+                <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+              </li>
+              <li>
+                <a href={X_URL} rel="noreferrer" target="_blank">{X_HANDLE} on X</a>
               </li>
             </ul>
           </section>
         </article>
       </div>
 
-      <footer className="legal-footer">
+      <footer className="legal-footer legal-footer--support" data-support-footer="balanced">
         <SupportBrand />
         <Link href="#top">Back to top</Link>
+        <a className="legal-footer-social" href={X_URL} rel="noreferrer" target="_blank">
+          {X_HANDLE}
+        </a>
         <span>© 2026 LocalCheck</span>
       </footer>
     </main>
