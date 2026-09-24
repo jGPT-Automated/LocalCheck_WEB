@@ -40,7 +40,7 @@ const faqs: readonly FaqItem[] = [
   {
     question: "Is LocalCheck free?",
     answer:
-      "Yes. LocalCheck is free to download and free to use. There are no in-app purchases, no subscription, and no ads.",
+      "Yes. LocalCheck is free to download, and you can use its core court features for free. LocalPlus is an optional subscription for additional features. LocalPlus launch offers for Starters and Pioneers are explained on the Pioneers page.",
   },
   {
     question: "What does the heatmap actually show?",

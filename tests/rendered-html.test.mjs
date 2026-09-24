@@ -98,6 +98,8 @@ test("explains the current launch reward rules on the Pioneers page", async () =
   assert.match(html, /five invited players/i);
   assert.match(html, /once a week for four weeks/i);
   assert.match(html, /one month of LocalPlus/i);
+  assert.match(html, /Apple offer code/i);
+  assert.match(html, /renews at the regular monthly price unless canceled/i);
   assert.doesNotMatch(html, /\+3 months of LocalPlus|\+1 month per player/i);
 });
 
@@ -109,4 +111,15 @@ test("shows court-specific artwork and the actual add-court flow on Pioneers", a
   assert.match(html, /data-court-art="basketball"/);
   assert.match(html, /src="\/app-screens\/add-court-start\.png"/);
   assert.match(html, /alt="LocalCheck app screen showing the add-a-court flow"/);
+});
+
+test("describes a free core app without contradicting the LocalPlus launch offers", async () => {
+  const how = await (await render("/how-it-works")).text();
+  const llms = await (await render("/llms.txt")).text();
+
+  assert.match(how, /core court features for free/i);
+  assert.match(how, /LocalPlus launch offers/i);
+  assert.doesNotMatch(how, /no in-app purchases, no subscription/i);
+  assert.match(llms, /LocalPlus launch offers/i);
+  assert.doesNotMatch(llms, /no purchases, no subscription|no in-app purchases/i);
 });

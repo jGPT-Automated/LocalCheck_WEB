@@ -85,7 +85,7 @@ const faqs = [
   },
   {
     q: "How do I become a Starter?",
-    a: "Be one of the first 100 people to download and join LocalCheck. Starters receive one free year of LocalPlus.",
+    a: "Be one of the first 100 people to download and join LocalCheck. The free LocalPlus year is redeemed with an Apple offer code in the app. It is a monthly subscription with the first year free, then renews at the regular monthly price unless canceled through Apple.",
   },
   {
     q: "How do you prevent fake courts?",
