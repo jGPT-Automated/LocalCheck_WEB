@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import HomeView from "./home-view";
 import { loadExplorerCourts } from "./courts/supabase-courts";
 import { deriveCourtStats } from "../lib/court-stats";
+import { SITE_DESCRIPTION } from "../lib/messaging";
 
 export const metadata: Metadata = {
-  title: "LocalCheck — Find Your Run",
-  description:
-    "Find live basketball and pickleball courts, see who is playing, and check in with one tap.",
+  title: "LocalCheck | Find Your Run",
+  description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
 };
 
@@ -24,5 +24,5 @@ export const revalidate = 180;
 
 export default async function Page() {
   const { courts } = await loadExplorerCourts();
-  return <HomeView stats={deriveCourtStats(courts)} />;
+  return <HomeView stats={deriveCourtStats(courts)} initialCourts={courts} />;
 }

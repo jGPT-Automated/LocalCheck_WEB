@@ -9,7 +9,6 @@ import {
   Check,
   Clock,
   CornersOut,
-  House,
   List,
   MapPin,
   PingPong,
@@ -19,58 +18,8 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
-import type { CourtDataResult } from "./courts/supabase-courts";
-
-type Sport = "basketball" | "pickleball";
-
-type Court = {
-  id: string;
-  sportId: Sport;
-  name: string;
-  sport: string;
-  status: string;
-  location: string;
-  count: number;
-  courtCount: string;
-  detail: string;
-  players: string[];
-  localCount: number;
-  isLocal: boolean;
-  activity: string;
-};
-
-const courts: Court[] = [
-  {
-    id: "austin-basketball-hancock",
-    sportId: "basketball",
-    name: "Hancock Recreation Center",
-    sport: "Basketball",
-    status: "Austin launch court",
-    location: "Austin, TX",
-    count: 0,
-    courtCount: "2 courts",
-    detail: "Outdoor · public & free",
-    players: [],
-    localCount: 0,
-    isLocal: false,
-    activity: "No public check-ins yet",
-  },
-  {
-    id: "austin-pickleball-pan-am",
-    sportId: "pickleball",
-    name: "Pan American Pickleball Courts",
-    sport: "Pickleball",
-    status: "Austin launch court",
-    location: "Austin, TX",
-    count: 0,
-    courtCount: "6 courts",
-    detail: "Outdoor · public & free",
-    players: [],
-    localCount: 0,
-    isLocal: false,
-    activity: "No public check-ins yet",
-  },
-];
+import { selectFeaturedCourts } from "../lib/featured-courts";
+import type { CourtDataResult, ExplorerCourt } from "./courts/supabase-courts";
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -84,16 +33,19 @@ function Brand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function CourtCard({ court }: { court: Court }) {
-  const [checkedIn, setCheckedIn] = useState(false);
-  const SportIcon = court.sportId === "basketball" ? Basketball : PingPong;
-  const count = court.count + (checkedIn ? 1 : 0);
+function CourtCard({ court }: { court: ExplorerCourt }) {
+  const SportIcon = court.sport === "basketball" ? Basketball : PingPong;
+  const status = court.localCount !== null && court.localCount > 0 ? "Most locals" : "Featured launch court";
+  const location = [court.city, court.state].filter(Boolean).join(", ");
+  const detail = [court.setting.replaceAll("_", " "), court.accessType.replaceAll("_", " ")].filter(Boolean).join(" · ");
+  const live = court.liveCount ?? "—";
+  const locals = court.localCount ?? "—";
 
   return (
-    <article className={`court-card court-card--${court.sportId}`} data-testid={`court-card-${court.sportId}`}>
-      <div className={`court-card__sport-art court-card__sport-art--${court.sportId}`} aria-hidden="true">
+    <article className={`court-card court-card--${court.sport}`} data-testid={`court-card-${court.sport}`}>
+      <div className={`court-card__sport-art court-card__sport-art--${court.sport}`} aria-hidden="true">
         <span className="court-lines__boundary" />
-        {court.sportId === "basketball" ? (
+        {court.sport === "basketball" ? (
           <>
             <span className="court-lines__arc" />
             <span className="court-lines__key" />
@@ -118,53 +70,36 @@ function CourtCard({ court }: { court: Court }) {
             <span className="sport-label__icon"><SportIcon size={16} weight="fill" /></span>
             {court.sport}
           </span>
-          {court.isLocal ? (
-            <span className="local-court-label"><House size={14} weight="fill" /> Your local court</span>
-          ) : (
-            <span className="distance-label">{court.status}</span>
-          )}
+          <span className="distance-label">{status}</span>
         </div>
 
         <div className="court-card__main">
           <h3>{court.name}</h3>
           <div className="court-card__location">
             <MapPin size={15} weight="fill" />
-            <span>{court.location}</span>
+            <span>{location}</span>
             <span className="meta-dot" />
-            <span>{court.status}</span>
+            <span>Verified court</span>
           </div>
-          <p>{court.courtCount} <span>·</span> {court.detail}</p>
+          <p>{court.courtCount === null ? "Court count unlisted" : `${court.courtCount} ${court.courtCount === 1 ? "court" : "courts"}`} <span>·</span> {detail}</p>
         </div>
 
-        <div className="court-card__activity" aria-label={`${count} live now and ${court.localCount} locals`}>
+        <div className="court-card__activity" aria-label={`${live} live now and ${locals} locals`}>
           <div className="activity-metric activity-metric--live">
             <span className="activity-metric__signal"><i /></span>
-            <strong>{count}</strong>
-            <span><b>Live now</b><small>{checkedIn ? "You are checked in" : court.activity}</small></span>
+            <strong>{live}</strong>
+            <span><b>Live now</b><small>{court.liveCount === null ? "Count unavailable" : court.liveCount === 0 ? "No public check-ins yet" : "Public check-ins"}</small></span>
           </div>
           <div className="activity-metric activity-metric--locals">
-            <div className="player-stack" aria-hidden="true">
-              {court.players.map((initials, index) => (
-                <span key={initials} style={{ zIndex: court.players.length - index }}>{initials}</span>
-              ))}
-            </div>
-            <strong>{court.localCount}</strong>
-            <span><b>Locals</b><small>Call this home</small></span>
+            <UsersThree size={22} aria-hidden="true" />
+            <strong>{locals}</strong>
+            <span><b>Locals</b><small>{court.localCount === null ? "Count unavailable" : "Call this home"}</small></span>
           </div>
         </div>
 
         <div className="court-card__actions">
-          <button
-            className={`button button--check${checkedIn ? " is-checked" : ""}`}
-            type="button"
-            onClick={() => setCheckedIn((value) => !value)}
-            aria-pressed={checkedIn}
-            data-testid={`check-in-${court.sportId}`}
-          >
-            {checkedIn ? <Check size={17} weight="bold" /> : null}
-            {checkedIn ? "Checked in" : "Check in"}
-          </button>
-          <Link className="button button--view" href={`/courts/${court.id}`} data-testid={`view-court-${court.sportId}`}>
+          <Link className="button button--check" href="/app">See the app <ArrowRight size={17} weight="bold" /></Link>
+          <Link className="button button--view" href={`/courts/${court.slug}`} data-testid={`view-court-${court.sport}`}>
             View court <ArrowRight size={17} weight="bold" />
           </Link>
         </div>
@@ -173,11 +108,12 @@ function CourtCard({ court }: { court: Court }) {
   );
 }
 
-export default function HomeView({ stats }: { stats: CourtStats }) {
+export default function HomeView({ stats, initialCourts }: { stats: CourtStats; initialCourts: ExplorerCourt[] }) {
   const heroRef = useRef<HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [counts, setCounts] = useState<CourtStats>(stats);
+  const [featured, setFeatured] = useState(() => selectFeaturedCourts(initialCourts));
 
   /* Server-rendered counts are authoritative. This refresh mirrors the
      `/courts` explorer: if Supabase has newer data than the build, the
@@ -196,6 +132,7 @@ export default function HomeView({ stats }: { stats: CourtStats }) {
            server render already used, so re-deriving it can only go backwards. */
         if (result.source === "supabase" && result.courts?.length) {
           setCounts(deriveCourtStats(result.courts));
+          setFeatured(selectFeaturedCourts(result.courts));
         }
       } catch {
         // Server-rendered counts stay correct; refresh is optional.
@@ -257,6 +194,7 @@ export default function HomeView({ stats }: { stats: CourtStats }) {
           <nav className="desktop-nav" aria-label="Primary navigation">
             <Link href="/courts">Find games</Link>
             <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
+            <Link href="/pioneers">Pioneers</Link>
             <button type="button" onClick={() => scrollTo("#about")}>About</button>
             <button type="button" onClick={() => setNotice("Login opens in the LocalCheck app.")}>Log in</button>
             <button className="nav-cta" type="button" onClick={() => scrollTo("#courts")}>Check in</button>
@@ -270,6 +208,7 @@ export default function HomeView({ stats }: { stats: CourtStats }) {
           <nav className="mobile-nav" aria-label="Mobile navigation">
             <Link href="/courts" onClick={() => setMenuOpen(false)}>Find games</Link>
             <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
+            <Link href="/pioneers" onClick={() => setMenuOpen(false)}>Pioneers</Link>
             <button type="button" onClick={() => scrollTo("#about")}>About</button>
             <button type="button" onClick={() => { setNotice("Login opens in the LocalCheck app."); setMenuOpen(false); }}>Log in</button>
           </nav>
@@ -305,28 +244,51 @@ export default function HomeView({ stats }: { stats: CourtStats }) {
       <section className="live-courts section" id="courts">
         <div className="section-heading">
           <div>
-            <span className="eyebrow eyebrow--orange">Launch court preview</span>
+            <span className="eyebrow eyebrow--orange">Community court spotlight</span>
             <h2>Know before<br />you go.</h2>
           </div>
-          <p>One court card, everywhere. The map starts with verified venue identity and access; live and local counts stay honest as the community checks in.</p>
+          <p>One verified basketball court and one pickleball court, selected by local community size. Before locals join, the launch set leads the way; live activity updates from the court feed.</p>
         </div>
 
         <div className="court-grid">
-          {courts.map((court) => <CourtCard court={court} key={court.id} />)}
+          {[featured.basketball, featured.pickleball].filter((court): court is ExplorerCourt => court !== null).map((court) => <CourtCard court={court} key={court.id} />)}
         </div>
 
         <div className="card-legend" aria-label="Court card design details">
           <span><i className="legend-dot" /> Orange always means live</span>
-          <span><UsersThree size={17} /> Counts start at zero—not fabricated</span>
+          <span><UsersThree size={17} /> Counts come from the court feed</span>
           <span><CornersOut size={17} /> Court geometry distinguishes each sport</span>
         </div>
+      </section>
+
+      <section className="launch-programs section" id="pioneers">
+        <div className="launch-programs__heading">
+          <span className="eyebrow eyebrow--orange">The first to show up</span>
+          <h2>Start the<br />movement<span>.</span></h2>
+          <p>Early players get more than a place on the map. Help a court come alive, and help the people around you find their run.</p>
+        </div>
+        <div className="launch-programs__offers">
+          <article>
+            <span className="launch-programs__number">01 / STARTERS</span>
+            <h3>The first 100.</h3>
+            <p>The first 100 people to download and join LocalCheck get one year of LocalPlus, on us.</p>
+            <strong>1 year of LocalPlus</strong>
+          </article>
+          <article>
+            <span className="launch-programs__number">02 / PIONEERS</span>
+            <h3>Build your court.</h3>
+            <p>Add a court and bring five invited players who each check in at least once a week for four weeks. You get a free year of LocalPlus; each invite gets a free month on sign-up.</p>
+            <strong>1 year for you · 1 month for each invite</strong>
+          </article>
+        </div>
+        <Link className="launch-programs__link" href="/pioneers">Explore the launch programs <ArrowRight size={18} weight="bold" /></Link>
       </section>
 
       <section className="how section" id="how">
         <div className="how__intro">
           <span className="eyebrow">No empty-court gamble</span>
           <h2>From couch<br />to court.</h2>
-          <p>LocalCheck turns the group text into a live, shared picture of your local sports scene.</p>
+          <p>LocalCheck is one shared platform for local courts, activity, and competition. See who is there now, who plans to play later, and organize the next run.</p>
         </div>
         <div className="steps">
           <article>
@@ -355,26 +317,17 @@ export default function HomeView({ stats }: { stats: CourtStats }) {
           <div className="about__copy">
             <span className="eyebrow eyebrow--orange">Built for local competition</span>
             <h2>Show up.<br />Play for something.</h2>
-            <p>Log games, build a real local ranking, and see the people who make your home court what it is.</p>
+            <p>Log reviewed games and build rankings that matter among friends, at your court, across your region, and eventually across LocalCheck.</p>
             <button className="text-button text-button--light" type="button" onClick={() => setNotice("Competition profiles are coming in the LocalCheck app.")}>Explore competition <ArrowRight size={18} weight="bold" /></button>
           </div>
-          <div className="rank-card" aria-label="Sample local leaderboard">
-            <header><span>East Austin · Basketball</span><strong>Local ranking</strong></header>
-            {[
-              ["01", "JM", "Jordan Miles", "1284", "+18"],
-              ["02", "AR", "Alex Rivera", "1251", "+7"],
-              ["03", "TK", "Taylor Kim", "1219", "+11"],
-              ["04", "MC", "Morgan Chen", "1188", "—"],
-            ].map((row, index) => (
-              <div className={index === 0 ? "is-current" : ""} key={row[0]}>
-                <span className="rank-number">{row[0]}</span>
-                <span className="rank-avatar">{row[1]}</span>
-                <strong>{row[2]}</strong>
-                <span className="rank-score">{row[3]}</span>
-                <small>{row[4]}</small>
-              </div>
-            ))}
-            <footer><span>Updated after every ranked game</span><ArrowUpRight size={17} /></footer>
+          <div className="rank-card" aria-label="Global leaderboard">
+            <header><span>LocalCheck · all courts</span><strong>Global leaderboard</strong></header>
+            <div className="rank-card__empty">
+              <span className="rank-card__empty-index">GLOBAL / —</span>
+              <h3>Earn your place.</h3>
+              <p>Public global standings are not available on the web yet. Once reviewed results and player visibility are ready, the rankings will appear here.</p>
+            </div>
+            <footer><span>Reviewed games · public players only</span><ArrowUpRight size={17} /></footer>
           </div>
         </div>
       </section>

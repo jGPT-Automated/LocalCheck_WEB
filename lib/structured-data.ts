@@ -5,6 +5,7 @@
  * render time — nothing here is hardcoded. See lib/court-stats.ts.
  */
 import { SITE_URL } from "./site";
+import { SITE_DESCRIPTION, SUPPORT_EMAIL, X_URL } from "./messaging";
 import type { ExplorerCourt } from "../app/courts/supabase-courts";
 
 export const ORG_ID = `${SITE_URL}/#organization`;
@@ -20,9 +21,9 @@ export function organizationSchema() {
     name: "LocalCheck",
     url: SITE_URL,
     logo: { "@type": "ImageObject", url: LOGO },
-    email: "localchecksports@gmail.com",
-    founder: { "@type": "Person", name: "Jesse Herrig" },
-    sameAs: ["https://x.com/localchecksports"],
+    description: SITE_DESCRIPTION,
+    email: SUPPORT_EMAIL,
+    sameAs: [X_URL],
   };
 }
 
@@ -59,7 +60,7 @@ export function mobileAppSchema() {
       "Weekly court heatmap showing when locals plan to play",
       "Geofenced one-tap check-in",
       "Scheduled pickup games with rosters",
-      "Game logging with ELO ratings and local leaderboards",
+      "Game logging with Elo ratings and friend, court, and regional leaderboards",
       "Opponent-reviewed score disputes",
       "AI-verified court submissions from a live camera capture",
     ],

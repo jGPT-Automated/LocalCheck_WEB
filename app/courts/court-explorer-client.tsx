@@ -106,6 +106,7 @@ function CourtListCard({
           <Metric value={court.localCount} label="Locals" />
         </div>
         <Link className={styles.cardLink} href={`/courts/${encodeURIComponent(court.id)}`} aria-label={`View ${court.name}`}>
+          <span>View court</span>
           <ArrowRight size={16} weight="bold" />
         </Link>
       </div>
@@ -117,12 +118,12 @@ type SheetDetent = "peek" | "half" | "full";
 
 /**
  * Mobile sheet detents as visible sheet height in px. These mirror the CSS
- * detents in explorer.module.css (--sheet-peek / --sheet-full-sliver / 55dvh),
+ * detents in explorer.module.css (--sheet-peek / --sheet-full-sliver / 42dvh),
  * so the drag snap points and the rendered positions agree.
  */
 const SHEET_PEAK_PX = 158;
 const SHEET_FULL_SLIVER_PX = 96;
-const SHEET_HALF_RATIO = 0.55;
+const SHEET_HALF_RATIO = 0.42;
 
 /**
  * Bottom padding for camera moves, so markers never hide behind the sheet.
@@ -164,14 +165,14 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [detent, setDetent] = useState<SheetDetent>("peek");
+  const [detent, setDetent] = useState<SheetDetent>("half");
   const [dragging, setDragging] = useState(false);
   const sheetRef = useRef<HTMLElement>(null);
   const dragRef = useRef({ pointerId: 0, startY: 0, startTy: 0, lastY: 0, lastTime: 0, velocity: 0, moved: false });
   /** A drag release also fires click on the handle; swallow that one click. */
   const suppressHandleClick = useRef(false);
   /** Imperative camera calls read this; kept in sync outside render. */
-  const detentRef = useRef<SheetDetent>("peek");
+  const detentRef = useRef<SheetDetent>("half");
 
   /* Keeps the imperative camera calls (selectCourt, resetMap, initial fit)
      reading the current detent without mutating a ref during render. */
@@ -541,7 +542,11 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
 
   useEffect(() => {
     if (!selectedId) return;
-    document.querySelector(`[data-court-id="${CSS.escape(selectedId)}"]`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    document.querySelector(`[data-court-id="${CSS.escape(selectedId)}"]`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
   }, [selectedId]);
 
   const selectCourt = (court: ExplorerCourt) => {
@@ -605,7 +610,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
           <div className={styles.sidebarHeader}>
             <span className={styles.eyebrow}><i /> Find your run</span>
             <div className={styles.titleRow}>
-              <div><h1>Find a court.</h1><p>Source-backed places now. Live community data as it grows.</p></div>
+              <div><h1>Find a court.</h1><p>Your courts, activity, and competition in one shared place.</p></div>
               <button className={styles.mobileFilter} type="button" onClick={() => setFiltersOpen((value) => !value)} aria-label="Toggle filters" aria-expanded={filtersOpen}>
                 {filtersOpen ? <X size={19} /> : <SlidersHorizontal size={19} />}
               </button>
@@ -636,7 +641,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             </div>
           </div>
 
-          <div className={styles.courtList} aria-live="polite">
+          <div className={styles.courtList} data-mobile-court-rail="true" aria-label="Court results" aria-live="polite">
             {filteredCourts.length ? filteredCourts.slice(0, 120).map((court) => (
               <CourtListCard court={court} selected={court.id === selectedId} onSelect={() => selectCourt(court)} key={court.id} />
             )) : (
@@ -653,7 +658,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             <div className={styles.mapFallback}>
               <MapPin size={28} weight="fill" />
               <strong>{mapState === "loading" ? "Loading courts" : "Map unavailable"}</strong>
-              <span>{mapState === "loading" ? "Building the live map" : "Court results are still available in the list"}</span>
+              <span>{mapState === "loading" ? "Building the live map" : "Court results are still available below"}</span>
             </div>
           ) : null}
           <button className={styles.fitButton} type="button" onClick={resetMap}><Crosshair size={17} weight="bold" /> Show all</button>

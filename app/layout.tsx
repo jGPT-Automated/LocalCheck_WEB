@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "../lib/site";
 import { jsonLd, siteNodes } from "../lib/structured-data";
+import { BRAND_LINE, SITE_DESCRIPTION } from "../lib/messaging";
 import "@fontsource-variable/inter";
 import "@fontsource/oswald/500.css";
 import "@fontsource/oswald/600.css";
@@ -10,9 +11,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "LocalCheck — Find Live Basketball & Pickleball Courts Near You",
-  description:
-    "LocalCheck shows when people actually plan to play at your local basketball and pickleball courts. See the weekly heatmap, check in with one tap, log games, and climb your local ranking.",
+  title: `LocalCheck | ${BRAND_LINE}`,
+  description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
   keywords: [
     "pickup basketball",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "local basketball runs",
   ],
   applicationName: "LocalCheck",
-  authors: [{ name: "Jesse Herrig" }],
+  authors: [{ name: "LocalCheck" }],
   creator: "LocalCheck",
   publisher: "LocalCheck",
   icons: {
@@ -31,9 +31,8 @@ export const metadata: Metadata = {
     shortcut: "/favicon.png",
   },
   openGraph: {
-    title: "LocalCheck — Find Live Basketball & Pickleball Courts Near You",
-    description:
-      "See when people actually plan to play at your local courts. Live check-ins, weekly heatmaps, and real local rankings for basketball and pickleball.",
+    title: `LocalCheck | ${BRAND_LINE}`,
+    description: SITE_DESCRIPTION,
     url: "/",
     siteName: "LocalCheck",
     images: [
@@ -49,9 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "LocalCheck — Find Live Basketball & Pickleball Courts Near You",
-    description:
-      "See when people actually plan to play at your local courts. Live check-ins, weekly heatmaps, and real local rankings.",
+    title: `LocalCheck | ${BRAND_LINE}`,
+    description: SITE_DESCRIPTION,
     images: ["/localcheck-logo-final-preview.png"],
   },
   robots: {
