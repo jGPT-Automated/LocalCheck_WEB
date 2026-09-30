@@ -185,9 +185,7 @@ a:focus-visible {
 }
 
 .desktop-nav {
-  display: flex;
-  align-items: center;
-  gap: clamp(25px, 2.8vw, 48px);
+  flex-shrink: 0;
 }
 
 .desktop-nav button,
@@ -245,7 +243,6 @@ a:focus-visible {
 }
 
 .menu-button {
-  display: none;
   width: 48px;
   height: 48px;
   place-items: center;
@@ -2116,14 +2113,6 @@ a:focus-visible {
 }
 
 @media (max-width: 880px) {
-  .desktop-nav {
-    display: none;
-  }
-
-  .menu-button {
-    display: grid;
-  }
-
   .hero__copy {
     width: min(640px, calc(100vw - 60px));
   }
