@@ -25,6 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
 import { selectFeaturedCourts } from "../lib/featured-courts";
 import type { CourtDataResult, ExplorerCourt } from "./courts/supabase-courts";
@@ -118,7 +119,6 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
 
 const PRIMARY_NAV = [
   { href: "/courts", label: "Courts" },
-  { href: "/app", label: "The app" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/pioneers", label: "Pioneers" },
   { href: "/#about", label: "About" },
@@ -128,9 +128,15 @@ function MobileNavigation() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="menu-button" type="button" aria-label="Open navigation">
+        <Button
+          className="menu-button grid lg:hidden"
+          type="button"
+          variant="outline"
+          size="icon-lg"
+          aria-label="Open navigation"
+        >
           <List size={27} />
-        </button>
+        </Button>
       </SheetTrigger>
       <SheetContent className="home-mobile-sheet">
         <SheetHeader className="home-mobile-sheet__header">
@@ -229,9 +235,11 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
 
         <header className="site-header">
           <Brand />
-          <nav className="desktop-nav" aria-label="Primary navigation">
+          <nav className="desktop-nav hidden items-center gap-6 whitespace-nowrap lg:flex xl:gap-10" aria-label="Primary navigation">
             {PRIMARY_NAV.map((item) => <Link href={item.href} key={item.href}>{item.label}</Link>)}
-            <Link className="nav-cta" href="/app">Explore the app</Link>
+            <Button asChild className="nav-cta h-12 px-6 xl:px-7" size="lg">
+              <Link href="/app">Explore the app</Link>
+            </Button>
           </nav>
           <MobileNavigation />
         </header>
