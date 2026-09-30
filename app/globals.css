@@ -227,9 +227,6 @@ a:focus-visible {
 }
 
 .nav-cta {
-  min-width: 112px;
-  min-height: 52px;
-  padding: 0 24px;
   border-radius: 3px !important;
   background: var(--orange) !important;
   transition: background 160ms ease, transform 160ms ease;

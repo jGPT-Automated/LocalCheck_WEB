@@ -119,7 +119,6 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
 
 const PRIMARY_NAV = [
   { href: "/courts", label: "Courts" },
-  { href: "/app", label: "The app" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/pioneers", label: "Pioneers" },
   { href: "/#about", label: "About" },
@@ -238,7 +237,9 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
           <Brand />
           <nav className="desktop-nav hidden items-center gap-6 whitespace-nowrap lg:flex xl:gap-10" aria-label="Primary navigation">
             {PRIMARY_NAV.map((item) => <Link href={item.href} key={item.href}>{item.label}</Link>)}
-            <Link className="nav-cta" href="/app">Explore the app</Link>
+            <Button asChild className="nav-cta h-12 px-6 xl:px-7" size="lg">
+              <Link href="/app">Explore the app</Link>
+            </Button>
           </nav>
           <MobileNavigation />
         </header>
