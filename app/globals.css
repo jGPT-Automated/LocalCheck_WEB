@@ -192,7 +192,6 @@ a:focus-visible {
 
 .desktop-nav button,
 .desktop-nav > a,
-.mobile-nav button,
 .mobile-nav > a {
   border: 0;
   background: transparent;
@@ -257,32 +256,81 @@ a:focus-visible {
   backdrop-filter: blur(16px);
 }
 
+.home-mobile-sheet {
+  width: min(400px, 92vw) !important;
+  border-left-color: rgba(242, 242, 246, 0.13) !important;
+  background: #111114 !important;
+  color: var(--ink) !important;
+}
+
+.home-mobile-sheet__header {
+  gap: 18px !important;
+  padding: 30px !important;
+  border-bottom: 1px solid var(--line);
+}
+
+.home-mobile-sheet__header p {
+  max-width: 30ch;
+  color: var(--muted) !important;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .mobile-nav {
-  position: absolute;
-  z-index: 19;
-  top: 96px;
-  right: 22px;
   display: grid;
-  min-width: 220px;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: rgba(21, 21, 25, 0.96);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(20px);
+  padding: 18px 30px 30px;
 }
 
-.mobile-nav button,
 .mobile-nav > a {
-  min-height: 50px;
-  padding: 0 16px;
-  border-radius: 10px;
+  display: grid;
+  min-height: 64px;
+  padding: 0;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.035em;
   text-align: left;
+  text-transform: uppercase;
+  transition: color 160ms ease, border-color 160ms ease;
 }
 
-.mobile-nav button:hover,
 .mobile-nav > a:hover {
-  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(252, 76, 2, 0.5);
+  color: var(--orange-bright);
+}
+
+.mobile-nav > a > span {
+  color: var(--orange);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.mobile-nav > a.mobile-nav__cta {
+  display: flex;
+  min-height: 52px;
+  margin-top: 28px;
+  padding: 0 20px;
+  justify-content: center;
+  border: 0;
+  border-radius: 3px;
+  background: var(--orange);
+  color: var(--night);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.mobile-nav > a.mobile-nav__cta:hover {
+  background: var(--orange-bright);
+  color: var(--night);
 }
 
 .hero__copy {

@@ -13,10 +13,18 @@ import {
   MapPin,
   PingPong,
   UsersThree,
-  X,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
 import { selectFeaturedCourts } from "../lib/featured-courts";
 import type { CourtDataResult, ExplorerCourt } from "./courts/supabase-courts";
@@ -108,9 +116,44 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
   );
 }
 
+const PRIMARY_NAV = [
+  { href: "/courts", label: "Courts" },
+  { href: "/app", label: "The app" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pioneers", label: "Pioneers" },
+  { href: "/#about", label: "About" },
+] as const;
+
+function MobileNavigation() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <button className="menu-button" type="button" aria-label="Open navigation">
+          <List size={27} />
+        </button>
+      </SheetTrigger>
+      <SheetContent className="home-mobile-sheet">
+        <SheetHeader className="home-mobile-sheet__header">
+          <SheetTitle asChild><Brand compact /></SheetTitle>
+          <SheetDescription>Courts, activity, competition, and the people building the local scene.</SheetDescription>
+        </SheetHeader>
+        <nav className="mobile-nav" aria-label="Mobile navigation">
+          {PRIMARY_NAV.map((item, index) => (
+            <SheetClose asChild key={item.href}>
+              <Link href={item.href}><span>{String(index + 1).padStart(2, "0")}</span>{item.label}</Link>
+            </SheetClose>
+          ))}
+          <SheetClose asChild>
+            <Link className="mobile-nav__cta" href="/app">Explore the app <ArrowRight size={18} weight="bold" /></Link>
+          </SheetClose>
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 export default function HomeView({ stats, initialCourts }: { stats: CourtStats; initialCourts: ExplorerCourt[] }) {
   const heroRef = useRef<HTMLElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [counts, setCounts] = useState<CourtStats>(stats);
   const [featured, setFeatured] = useState(() => selectFeaturedCourts(initialCourts));
@@ -178,11 +221,6 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
     return () => window.clearTimeout(timeout);
   }, [notice]);
 
-  const scrollTo = (id: string) => {
-    document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
-  };
-
   return (
     <main id="top">
       <section className="hero" ref={heroRef}>
@@ -192,27 +230,11 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
         <header className="site-header">
           <Brand />
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/courts">Find games</Link>
-            <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
-            <Link href="/pioneers">Pioneers</Link>
-            <button type="button" onClick={() => scrollTo("#about")}>About</button>
-            <button type="button" onClick={() => setNotice("Login opens in the LocalCheck app.")}>Log in</button>
-            <button className="nav-cta" type="button" onClick={() => scrollTo("#courts")}>Check in</button>
+            {PRIMARY_NAV.map((item) => <Link href={item.href} key={item.href}>{item.label}</Link>)}
+            <Link className="nav-cta" href="/app">Explore the app</Link>
           </nav>
-          <button className="menu-button" type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-label="Open navigation">
-            {menuOpen ? <X size={25} /> : <List size={27} />}
-          </button>
+          <MobileNavigation />
         </header>
-
-        {menuOpen ? (
-          <nav className="mobile-nav" aria-label="Mobile navigation">
-            <Link href="/courts" onClick={() => setMenuOpen(false)}>Find games</Link>
-            <button type="button" onClick={() => scrollTo("#how")}>How it works</button>
-            <Link href="/pioneers" onClick={() => setMenuOpen(false)}>Pioneers</Link>
-            <button type="button" onClick={() => scrollTo("#about")}>About</button>
-            <button type="button" onClick={() => { setNotice("Login opens in the LocalCheck app."); setMenuOpen(false); }}>Log in</button>
-          </nav>
-        ) : null}
 
         <div className="hero__copy">
           <span className="hero__eyebrow"><i /> {counts.markets} cities now mapped</span>
@@ -222,7 +244,7 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
             <Link className="button button--hero" href="/courts">
               Explore {counts.total} courts <ArrowRight size={19} weight="bold" />
             </Link>
-            <button className="text-button" type="button" onClick={() => scrollTo("#how")}>See how it works <CaretRight size={17} weight="bold" /></button>
+            <Link className="text-button" href="/how-it-works">See how it works <CaretRight size={17} weight="bold" /></Link>
           </div>
         </div>
 
