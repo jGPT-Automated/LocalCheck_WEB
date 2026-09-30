@@ -2612,7 +2612,7 @@ a:focus-visible {
 .court-page__signals {
   display: grid;
   max-width: 760px;
-  grid-template-columns: 1fr 1fr 1.2fr;
+  grid-template-columns: 1fr 1fr;
   margin-top: 38px;
   overflow: hidden;
   border: 1px solid rgba(242, 242, 246, 0.1);
@@ -3374,8 +3374,8 @@ a:focus-visible {
   border-radius: 7px;
   background: #212128;
   color: white;
-  cursor: pointer;
-  transition: border-color 150ms ease, filter 150ms ease, transform 150ms ease, background 150ms ease;
+  cursor: default;
+  transition: background 150ms ease;
 }
 
 .court-heatmap__cell.level-0 { background: #212128; }
@@ -3383,32 +3383,6 @@ a:focus-visible {
 .court-heatmap__cell.level-2 { background: var(--heat-2); }
 .court-heatmap__cell.level-3 { background: var(--heat-3); }
 .court-heatmap__cell.level-4 { background: var(--heat-4); }
-
-.court-heatmap__cell:hover {
-  z-index: 2;
-  border-color: rgba(255, 255, 255, 0.5);
-  filter: brightness(1.13);
-  transform: translateY(-2px);
-}
-
-.court-heatmap__cell.is-selected {
-  z-index: 3;
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 2px rgba(252, 76, 2, 0.25), 0 10px 28px rgba(0, 0, 0, 0.32);
-}
-
-.court-heatmap__cell.has-me::after {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 5px;
-  height: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.92);
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.55);
-  content: "";
-}
 
 .court-heatmap__cell > span {
   font-family: var(--font-display);
@@ -3418,9 +3392,7 @@ a:focus-visible {
   transition: opacity 140ms ease;
 }
 
-.court-heatmap__cell:hover > span,
-.court-heatmap__cell.is-selected > span,
-.court-heatmap__cell.has-me > span {
+.court-heatmap__cell:not(.level-0) > span {
   opacity: 1;
 }
 

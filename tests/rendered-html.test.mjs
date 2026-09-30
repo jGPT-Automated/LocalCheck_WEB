@@ -69,6 +69,18 @@ test("renders the court explorer with a mobile horizontal result rail", async ()
   assert.match(html, /Your courts, activity, and competition in one shared place/i);
 });
 
+test("renders court details as a read-only view of the app schedule", async () => {
+  const response = await render("/courts/los-angeles-basketball-rancho-cienega");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /8 AM/i);
+  assert.match(html, /10 PM/i);
+  assert.match(html, /View only/i);
+  assert.match(html, /Open the LocalCheck app to add or change plans/i);
+  assert.doesNotMatch(html, /Check in now|Make this local|Make this my local court|I(?:&apos;|')m going|Remove my time/i);
+});
+
 test("renders the canonical community platform message on the homepage", async () => {
   const response = await render("/");
   const html = await response.text();

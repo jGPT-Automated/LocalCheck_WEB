@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CourtPageClient from "./court-page-client";
 import type { CourtDetail } from "./court-data";
-import { loadExplorerCourt } from "../supabase-courts";
+import { loadCourtPlannedTimes, loadExplorerCourt } from "../supabase-courts";
 import { SITE_URL } from "../../../lib/site";
 import { breadcrumbSchema, courtSchema, jsonLd } from "../../../lib/structured-data";
 
@@ -97,22 +97,20 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
       coordinates: [listing.longitude, listing.latitude],
       liveCount: listing.liveCount ?? 0,
       localCount: listing.localCount ?? 0,
-      isLocal: false,
       liveNote: listing.liveCount ? "Players checked in" : "No public check-ins yet",
-      peakWindow: "Weekly intent builds as locals make plans",
       details: [
         { label: "Setup", value: listing.courtCount ? `${listing.courtCount} ${listing.courtCount === 1 ? "court" : "courts"}` : "Not listed" },
         { label: "Access", value: access },
         { label: "Setting", value: setting },
         { label: "Status", value: listing.verified ? "Source verified" : "Needs review" },
       ],
-      players: [],
-      schedule: [],
-      activity: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     } satisfies CourtDetail;
   }
 
   if (!court || !listing) notFound();
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const plannedTimes = await loadCourtPlannedTimes(court.id, todayIso);
 
   return (
     <>
@@ -135,7 +133,9 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
       <CourtPageClient
         court={court}
         mapboxToken={await getMapboxToken()}
-        todayIso={new Date().toISOString().slice(0, 10)}
+        todayIso={todayIso}
+        plannedAt={plannedTimes.plannedAt}
+        scheduleDataAvailable={plannedTimes.source === "supabase"}
       />
     </>
   );
