@@ -38,6 +38,8 @@ export type CourtDataResult = {
 type RuntimeEnv = {
   SUPABASE_URL?: string;
   SUPABASE_PUBLISHABLE_KEY?: string;
+  SUPABASE_SECRET_KEY?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
 };
 
 type RawCourt = Record<string, unknown>;
@@ -277,4 +279,64 @@ export async function loadExplorerCourt(idOrSlug: string): Promise<ExplorerCourt
   }
 
   return launchCourts.find((court) => court.id === idOrSlug || court.slug === idOrSlug) ?? null;
+}
+
+export type CourtPlannedTimesResult = {
+  plannedAt: string[];
+  source: "supabase" | "unavailable";
+};
+
+/**
+ * Read-only aggregate input for the public court heatmap.
+ *
+ * The mobile app's existing `court_planned_times` RPC returns timestamps only,
+ * including private/friends-only plans without exposing player identities. The
+ * RPC is authenticated-only, so the website calls it exclusively from the
+ * server with an optional server secret. No browser bundle receives the key and
+ * this code never writes to Supabase.
+ */
+export async function loadCourtPlannedTimes(
+  courtId: string,
+  todayIso: string,
+): Promise<CourtPlannedTimesResult> {
+  const env = await getRuntimeEnv();
+  const baseUrl = env.SUPABASE_URL?.replace(/\/$/, "");
+  const secretKey = env.SUPABASE_SECRET_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!baseUrl || !secretKey) return { plannedAt: [], source: "unavailable" };
+
+  const from = new Date(`${todayIso}T00:00:00.000Z`);
+  from.setUTCDate(from.getUTCDate() - 1);
+  const to = new Date(`${todayIso}T00:00:00.000Z`);
+  to.setUTCDate(to.getUTCDate() + 8);
+
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    apikey: secretKey,
+  };
+  if (!secretKey.startsWith("sb_secret_")) {
+    headers.Authorization = `Bearer ${secretKey}`;
+  }
+
+  try {
+    const response = await fetch(`${baseUrl}/rest/v1/rpc/court_planned_times`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        p_court_id: courtId,
+        p_from: from.toISOString(),
+        p_to: to.toISOString(),
+      }),
+      cache: "no-store",
+    });
+    if (!response.ok) return { plannedAt: [], source: "unavailable" };
+
+    const rows = await response.json();
+    const plannedAt = Array.isArray(rows)
+      ? rows.filter((value): value is string => typeof value === "string" && !Number.isNaN(Date.parse(value)))
+      : [];
+    return { plannedAt, source: "supabase" };
+  } catch {
+    return { plannedAt: [], source: "unavailable" };
+  }
 }
