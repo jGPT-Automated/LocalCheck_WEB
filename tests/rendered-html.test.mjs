@@ -128,6 +128,12 @@ test("keeps the privacy contact brand-level", async () => {
 
   assert.equal(response.status, 200);
   assert.match(html, /localchecksports@gmail\.com/i);
+  assert.match(html, /Privacy at a glance/i);
+  assert.match(html, /Public, Friends Only, and Private/i);
+  assert.match(html, /Settings → Delete Account/i);
+  assert.match(html, /RevenueCat/i);
+  assert.match(html, /does not sell your personal information/i);
+  assert.doesNotMatch(html, /health data|address book|contacts permission/i);
   assert.doesNotMatch(html, /Jesse Herrig/i);
 });
 
