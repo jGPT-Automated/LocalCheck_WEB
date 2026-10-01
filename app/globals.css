@@ -1626,6 +1626,85 @@ a:focus-visible {
   margin-top: 8px;
 }
 
+.privacy-summary {
+  display: grid;
+  margin: 8px 0 30px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.privacy-summary__item {
+  display: grid;
+  min-height: 218px;
+  padding: 26px 24px;
+  align-content: start;
+  border-right: 1px solid var(--line);
+  gap: 15px;
+}
+
+.privacy-summary__item:last-child {
+  border-right: 0;
+}
+
+.privacy-summary__item > span {
+  color: var(--orange);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.privacy-summary__item > strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.privacy-summary__item > p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.privacy-plain-language {
+  padding: 22px 24px 4px;
+  border-left: 2px solid var(--orange);
+  background: rgba(252, 76, 2, 0.07);
+}
+
+.privacy-plain-language p {
+  margin-bottom: 16px;
+}
+
+.privacy-providers {
+  display: grid;
+  margin: 28px 0 30px;
+  border-top: 1px solid var(--line);
+}
+
+.privacy-providers > div {
+  display: grid;
+  min-height: 62px;
+  padding: 14px 0;
+  grid-template-columns: minmax(120px, 0.34fr) 1fr;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  gap: 24px;
+}
+
+.privacy-providers strong {
+  font-size: 13px;
+}
+
+.privacy-providers span {
+  color: #aaaab7;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .legal-footer {
   display: grid;
   min-height: 110px;
@@ -1686,6 +1765,20 @@ a:focus-visible {
     grid-template-columns: 1fr 1fr;
     column-gap: 24px;
   }
+
+  .privacy-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-summary__item {
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .privacy-summary__item:last-child {
+    border-bottom: 0;
+  }
 }
 
 @media (max-width: 620px) {
@@ -1745,6 +1838,11 @@ a:focus-visible {
 
   .legal-copy address {
     width: 100%;
+  }
+
+  .privacy-providers > div {
+    grid-template-columns: 1fr;
+    gap: 5px;
   }
 
   .legal-footer {
