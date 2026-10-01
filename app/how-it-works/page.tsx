@@ -1,6 +1,6 @@
-import { ArrowLeft, Check, CornersOut } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 import { loadExplorerCourts } from "../courts/supabase-courts";
 import { deriveCourtStats } from "../../lib/court-stats";
 import { breadcrumbSchema, faqSchema, jsonLd } from "../../lib/structured-data";
@@ -89,18 +89,6 @@ const faqs: readonly FaqItem[] = [
   },
 ];
 
-function PageBrand() {
-  return (
-    <Link className="brand brand--compact" href="/" aria-label="LocalCheck home">
-      <span className="brand__mark" aria-hidden="true">
-        <CornersOut size={27} weight="regular" />
-        <Check className="brand__check" size={14} weight="bold" />
-      </span>
-      <span className="brand__word">LOCALCHECK</span>
-    </Link>
-  );
-}
-
 export default async function HowItWorksPage() {
   const { courts } = await loadExplorerCourts();
   const stats = deriveCourtStats(courts);
@@ -118,13 +106,7 @@ export default async function HowItWorksPage() {
         )}
       />
 
-      <header className="legal-header">
-        <PageBrand />
-        <Link className="legal-back" href="/" aria-label="Back to LocalCheck">
-          <ArrowLeft size={16} weight="bold" />
-          <span className="legal-back__label">Back to LocalCheck</span>
-        </Link>
-      </header>
+      <SiteHeader />
 
       <section className="legal-hero" aria-labelledby="page-title">
         <div>
@@ -341,7 +323,7 @@ export default async function HowItWorksPage() {
       </div>
 
       <footer className="legal-footer">
-        <PageBrand />
+        <SiteBrand compact />
         <Link href="#top">Back to top</Link>
         <span>© 2026 LocalCheck</span>
       </footer>

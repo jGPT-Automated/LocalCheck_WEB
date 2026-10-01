@@ -9,38 +9,16 @@ import {
   Check,
   Clock,
   CornersOut,
-  List,
   MapPin,
   PingPong,
   UsersThree,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
 import { selectFeaturedCourts } from "../lib/featured-courts";
 import type { CourtDataResult, ExplorerCourt } from "./courts/supabase-courts";
-
-function Brand({ compact = false }: { compact?: boolean }) {
-  return (
-    <a className={`brand${compact ? " brand--compact" : ""}`} href="#top" aria-label="LocalCheck home">
-      <span className="brand__mark" aria-hidden="true">
-        <CornersOut size={compact ? 27 : 34} weight="regular" />
-        <Check className="brand__check" size={compact ? 14 : 18} weight="bold" />
-      </span>
-      <span className="brand__word">LOCALCHECK</span>
-    </a>
-  );
-}
 
 function CourtCard({ court }: { court: ExplorerCourt }) {
   const SportIcon = court.sport === "basketball" ? Basketball : PingPong;
@@ -114,47 +92,6 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
         </div>
       </div>
     </article>
-  );
-}
-
-const PRIMARY_NAV = [
-  { href: "/courts", label: "Courts" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/pioneers", label: "Pioneers" },
-  { href: "/#about", label: "About" },
-] as const;
-
-function MobileNavigation() {
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          className="menu-button grid lg:hidden"
-          type="button"
-          variant="outline"
-          size="icon-lg"
-          aria-label="Open navigation"
-        >
-          <List size={27} />
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="home-mobile-sheet">
-        <SheetHeader className="home-mobile-sheet__header">
-          <SheetTitle asChild><Brand compact /></SheetTitle>
-          <SheetDescription>Courts, activity, competition, and the people building the local scene.</SheetDescription>
-        </SheetHeader>
-        <nav className="mobile-nav" aria-label="Mobile navigation">
-          {PRIMARY_NAV.map((item, index) => (
-            <SheetClose asChild key={item.href}>
-              <Link href={item.href}><span>{String(index + 1).padStart(2, "0")}</span>{item.label}</Link>
-            </SheetClose>
-          ))}
-          <SheetClose asChild>
-            <Link className="mobile-nav__cta" href="/app">Explore the app <ArrowRight size={18} weight="bold" /></Link>
-          </SheetClose>
-        </nav>
-      </SheetContent>
-    </Sheet>
   );
 }
 
@@ -233,16 +170,7 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
         <img className="hero__art" src="/hero-map.png" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
         <div className="hero__veil" aria-hidden="true" />
 
-        <header className="site-header">
-          <Brand />
-          <nav className="desktop-nav hidden items-center gap-6 whitespace-nowrap lg:flex xl:gap-10" aria-label="Primary navigation">
-            {PRIMARY_NAV.map((item) => <Link href={item.href} key={item.href}>{item.label}</Link>)}
-            <Button asChild className="nav-cta h-12 px-6 xl:px-7" size="lg">
-              <Link href="/app">Explore the app</Link>
-            </Button>
-          </nav>
-          <MobileNavigation />
-        </header>
+        <SiteHeader />
 
         <div className="hero__copy">
           <span className="hero__eyebrow"><i /> {counts.markets} cities now mapped</span>
@@ -370,7 +298,7 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
       </section>
 
       <footer className="site-footer">
-        <Brand compact />
+        <SiteBrand compact />
         <p>Live courts. Real competition.</p>
         <div><Link href="/pioneers">Pioneers</Link><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><a href="#top">Back to top</a><span>© 2026 LocalCheck</span></div>
       </footer>

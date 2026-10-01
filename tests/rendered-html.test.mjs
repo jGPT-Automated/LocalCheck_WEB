@@ -89,6 +89,43 @@ test("renders the canonical community platform message on the homepage", async (
   assert.match(html, /one shared platform for local courts, activity, and competition/i);
 });
 
+test("renders one consistent site header on every public page", async () => {
+  const routes = [
+    "/",
+    "/app",
+    "/how-it-works",
+    "/pioneers",
+    "/support",
+    "/privacy",
+    "/terms",
+    "/courts",
+    "/courts/los-angeles-basketball-rancho-cienega",
+  ];
+
+  for (const route of routes) {
+    const response = await render(route);
+    const html = await response.text();
+
+    assert.equal(response.status, 200, route);
+    assert.match(html, /data-site-header=["']true["']/i, route);
+    assert.match(html, /href=["']\/app#heatmap["'][^>]*>Heatmap</i, route);
+    assert.match(html, /href=["']\/app#competition["'][^>]*>Competition</i, route);
+    assert.match(html, /href=["']\/app#verify["'][^>]*>Add a court</i, route);
+    assert.match(html, /href=["']\/pioneers["'][^>]*>Pioneers</i, route);
+    assert.match(html, /href=["']\/courts["'][^>]*>Find a court/i, route);
+  }
+});
+
+test("renders the shared site header on the custom not-found page", async () => {
+  const response = await render("/this-page-does-not-exist");
+  const html = await response.text();
+
+  assert.equal(response.status, 404);
+  assert.match(html, /data-site-header=["']true["']/i);
+  assert.match(html, /Page not found/i);
+  assert.match(html, /href=["']\/courts["'][^>]*>Find a court/i);
+});
+
 test("promotes Starters and Pioneers on the homepage without sample rankings", async () => {
   const response = await render("/");
   const html = await response.text();

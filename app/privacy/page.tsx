@@ -1,6 +1,6 @@
-import { ArrowLeft, Check, CornersOut } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — LocalCheck",
@@ -21,27 +21,10 @@ const sections = [
   ["contact", "Contact us"],
 ] as const;
 
-function PrivacyBrand() {
-  return (
-    <Link className="brand brand--compact" href="/" aria-label="LocalCheck home">
-      <span className="brand__mark" aria-hidden="true">
-        <CornersOut size={27} weight="regular" />
-        <Check className="brand__check" size={14} weight="bold" />
-      </span>
-      <span className="brand__word">LOCALCHECK</span>
-    </Link>
-  );
-}
-
 export default function PrivacyPolicy() {
   return (
     <main className="legal-page" id="top">
-      <header className="legal-header">
-        <PrivacyBrand />
-        <Link className="legal-back" href="/" aria-label="Back to LocalCheck">
-          <ArrowLeft size={16} weight="bold" /> <span className="legal-back__label">Back to LocalCheck</span>
-        </Link>
-      </header>
+      <SiteHeader />
 
       <section className="legal-hero" aria-labelledby="privacy-title">
         <div>
@@ -216,7 +199,7 @@ export default function PrivacyPolicy() {
       </div>
 
       <footer className="legal-footer">
-        <PrivacyBrand />
+        <SiteBrand compact />
         <Link href="#top">Back to top</Link>
         <span>© 2026 LocalCheck</span>
       </footer>

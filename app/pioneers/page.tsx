@@ -1,7 +1,8 @@
-import { ArrowLeft, ArrowRight, Camera, Check, CornersOut, MapPin, UsersThree } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, Camera, Check, MapPin, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
   title: "Local Pioneers — LocalCheck",
@@ -110,18 +111,6 @@ const faqJsonLd = {
   })),
 };
 
-function PioneersBrand() {
-  return (
-    <Link className="brand brand--compact" href="/" aria-label="LocalCheck home">
-      <span className="brand__mark" aria-hidden="true">
-        <CornersOut size={27} weight="regular" />
-        <Check className="brand__check" size={14} weight="bold" />
-      </span>
-      <span className="brand__word">LOCALCHECK</span>
-    </Link>
-  );
-}
-
 function PioneerCourtArt() {
   return (
     <div className="pioneers-court-art" data-court-art="basketball" aria-hidden="true">
@@ -151,12 +140,7 @@ export default function PioneersPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
-      <header className="legal-header">
-        <PioneersBrand />
-        <Link className="legal-back" href="/" aria-label="Back to LocalCheck">
-          <ArrowLeft size={16} weight="bold" /> <span className="legal-back__label">Back to LocalCheck</span>
-        </Link>
-      </header>
+      <SiteHeader />
 
       <section className="legal-hero pioneers-hero" aria-labelledby="pioneers-title">
         <PioneerCourtArt />
@@ -329,7 +313,7 @@ export default function PioneersPage() {
       </div>
 
       <footer className="legal-footer">
-        <PioneersBrand />
+        <SiteBrand compact />
         <Link href="#top">Back to top</Link>
         <span>© 2026 LocalCheck</span>
       </footer>

@@ -3,8 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { Check, CornersOut, Trophy } from "@phosphor-icons/react";
-import { Menu } from "lucide-react";
+import { Trophy } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,15 +12,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Tabs,
   TabsContent,
@@ -34,6 +24,7 @@ import { CalendarDaysIcon } from "@/components/ui/calendar-days";
 import { CircleCheckIcon } from "@/components/ui/circle-check";
 import { MapPinIcon } from "@/components/ui/map-pin";
 import { SwitchCameraIcon } from "@/components/ui/switch-camera";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 import { PRODUCT_EXPLANATION, PUBLIC_PROMISE } from "@/lib/messaging";
 import styles from "./app-overview.module.css";
 
@@ -45,31 +36,12 @@ type ScreenProps = {
   wide?: boolean;
 };
 
-const NAV_ITEMS = [
-  { href: "#heatmap", label: "Heatmap" },
-  { href: "#competition", label: "Competition" },
-  { href: "#verify", label: "Add a court" },
-  { href: "/pioneers", label: "Pioneers" },
-];
-
 const JOURNEY = [
   { number: "01", label: "Find a verified court" },
   { number: "02", label: "See when locals plan to play" },
   { number: "03", label: "Check in or schedule a game" },
   { number: "04", label: "Settle the result" },
 ];
-
-function Brand({ compact = false }: { compact?: boolean }) {
-  return (
-    <Link href="/" className={`${styles.brand} ${compact ? styles.brandCompact : ""}`}>
-      <span className={styles.brandMark} aria-hidden="true">
-        <CornersOut size={compact ? 27 : 31} weight="bold" />
-        <Check className={styles.brandCheck} size={compact ? 18 : 21} weight="bold" />
-      </span>
-      <span>LOCALCHECK</span>
-    </Link>
-  );
-}
 
 function ProductScreen({ src, alt, className = "", priority = false, wide = false }: ScreenProps) {
   return (
@@ -114,47 +86,6 @@ function Eyebrow({ index, children, light = false }: { index: string; children: 
   );
 }
 
-function DesktopNavigation() {
-  return (
-    <nav className={styles.desktopNav} aria-label="App overview">
-      {NAV_ITEMS.map((item) => (
-        <Link key={item.href} href={item.href}>{item.label}</Link>
-      ))}
-      <Button asChild className={styles.headerCta}>
-        <Link href="/courts">Find a court <ArrowRightIcon size={17} /></Link>
-      </Button>
-    </nav>
-  );
-}
-
-function MobileNavigation() {
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className={styles.menuButton} aria-label="Open navigation">
-          <Menu size={21} strokeWidth={2.5} />
-        </Button>
-      </SheetTrigger>
-      <SheetContent className={styles.mobileSheet}>
-        <SheetHeader className={styles.mobileSheetHeader}>
-          <SheetTitle><Brand compact /></SheetTitle>
-          <SheetDescription>The app that gets the local run out of the group chat.</SheetDescription>
-        </SheetHeader>
-        <nav className={styles.mobileNav} aria-label="Mobile app overview">
-          {NAV_ITEMS.map((item, index) => (
-            <SheetClose key={item.href} asChild>
-              <Link href={item.href}><span>0{index + 1}</span>{item.label}</Link>
-            </SheetClose>
-          ))}
-          <SheetClose asChild>
-            <Link href="/courts" className={styles.mobileCta}>Find a court <ArrowRightIcon size={18} /></Link>
-          </SheetClose>
-        </nav>
-      </SheetContent>
-    </Sheet>
-  );
-}
-
 export function AppOverview() {
   const reduced = useReducedMotion();
 
@@ -162,11 +93,7 @@ export function AppOverview() {
     <main className={styles.page} data-app-overview="true">
       <section className={styles.hero}>
         <div className={styles.heroGrid} aria-hidden="true" />
-        <header className={styles.header}>
-          <Brand />
-          <DesktopNavigation />
-          <MobileNavigation />
-        </header>
+        <SiteHeader />
 
         <div className={styles.heroInner}>
           <motion.div
@@ -496,7 +423,7 @@ export function AppOverview() {
       </section>
 
       <footer className={styles.footer}>
-        <Brand compact />
+        <SiteBrand compact />
         <div className={styles.footerLinks}>
           <Link href="/courts">Courts</Link>
           <Link href="/pioneers">Pioneers</Link>

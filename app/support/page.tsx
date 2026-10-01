@@ -1,6 +1,7 @@
-import { ArrowLeft, Check, CornersOut, EnvelopeSimple, XLogo } from "@phosphor-icons/react/dist/ssr";
+import { EnvelopeSimple, XLogo } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 import {
   COMMUNITY_PROMISE,
   PRODUCT_EXPLANATION,
@@ -23,27 +24,10 @@ const sections = [
   ["resources", "Helpful links"],
 ] as const;
 
-function SupportBrand() {
-  return (
-    <Link className="brand brand--compact" href="/" aria-label="LocalCheck home">
-      <span className="brand__mark" aria-hidden="true">
-        <CornersOut size={27} weight="regular" />
-        <Check className="brand__check" size={14} weight="bold" />
-      </span>
-      <span className="brand__word">LOCALCHECK</span>
-    </Link>
-  );
-}
-
 export default function SupportPage() {
   return (
     <main className="legal-page" id="top">
-      <header className="legal-header">
-        <SupportBrand />
-        <Link className="legal-back" href="/" aria-label="Back to LocalCheck">
-          <ArrowLeft size={16} weight="bold" /> <span className="legal-back__label">Back to LocalCheck</span>
-        </Link>
-      </header>
+      <SiteHeader />
 
       <section className="legal-hero" aria-labelledby="support-title">
         <div>
@@ -219,7 +203,7 @@ export default function SupportPage() {
       </div>
 
       <footer className="legal-footer legal-footer--support" data-support-footer="balanced">
-        <SupportBrand />
+        <SiteBrand compact />
         <Link href="#top">Back to top</Link>
         <a className="legal-footer-social" href={X_URL} rel="noreferrer" target="_blank">
           {X_HANDLE}
