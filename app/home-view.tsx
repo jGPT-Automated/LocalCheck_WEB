@@ -14,8 +14,10 @@ import {
   UsersThree,
 } from "@phosphor-icons/react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { SiteBrand, SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { deriveCourtStats, type CourtStats } from "../lib/court-stats";
 import { selectFeaturedCourts } from "../lib/featured-courts";
 import type { CourtDataResult, ExplorerCourt } from "./courts/supabase-courts";
@@ -97,7 +99,7 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
 
 export default function HomeView({ stats, initialCourts }: { stats: CourtStats; initialCourts: ExplorerCourt[] }) {
   const heroRef = useRef<HTMLElement>(null);
-  const [notice, setNotice] = useState("");
+  const reducedMotion = useReducedMotion();
   const [counts, setCounts] = useState<CourtStats>(stats);
   const [featured, setFeatured] = useState(() => selectFeaturedCourts(initialCourts));
 
@@ -158,22 +160,29 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
     };
   }, []);
 
-  useEffect(() => {
-    if (!notice) return;
-    const timeout = window.setTimeout(() => setNotice(""), 3200);
-    return () => window.clearTimeout(timeout);
-  }, [notice]);
-
   return (
     <main id="top">
       <section className="hero" ref={heroRef}>
         <img className="hero__art" src="/hero-map.png" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
         <div className="hero__veil" aria-hidden="true" />
+        <div className="hero__activity" aria-hidden="true"><span /><span /><span /></div>
 
         <SiteHeader />
 
         <div className="hero__copy">
-          <span className="hero__eyebrow"><i /> {counts.markets} cities now mapped</span>
+          <span className="hero__eyebrow">
+            <i />
+            <motion.strong
+              data-live-market-count="true"
+              key={counts.markets}
+              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+              animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {counts.markets}
+            </motion.strong>
+            cities now mapped
+          </span>
           <h1>Find<br />your<br />run<span>.</span></h1>
           <p>Live courts. Real competition.</p>
           <div className="hero__actions">
@@ -184,18 +193,9 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
           </div>
         </div>
 
-        <div className="hero__signal" aria-label="LocalCheck launch court summary">
-          <span><strong>{counts.total}</strong> launch courts</span>
-          <i />
-          <span><strong>{counts.basketball}</strong> basketball</span>
-          <i />
-          <span><strong>{counts.pickleball}</strong> pickleball</span>
-        </div>
-
         <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
           <span>Scan to preview the app</span>
           <img src="/qr-localcheck.png" alt="QR code for LocalCheck" width="78" height="78" />
-          <ArrowUpRight size={17} weight="bold" />
         </a>
       </section>
 
@@ -276,7 +276,6 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
             <span className="eyebrow eyebrow--orange">Built for local competition</span>
             <h2>Show up.<br />Play for something.</h2>
             <p>Log reviewed games and build rankings that matter among friends, at your court, across your region, and eventually across LocalCheck.</p>
-            <button className="text-button text-button--light" type="button" onClick={() => setNotice("Competition profiles are coming in the LocalCheck app.")}>Explore competition <ArrowRight size={18} weight="bold" /></button>
           </div>
           <div className="rank-card" aria-label="Global leaderboard">
             <header><span>LocalCheck · all courts</span><strong>Global leaderboard</strong></header>
@@ -297,13 +296,7 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
         <Link className="button button--hero" href="/courts">Explore courts <ArrowRight size={19} weight="bold" /></Link>
       </section>
 
-      <footer className="site-footer">
-        <SiteBrand compact />
-        <p>Live courts. Real competition.</p>
-        <div><Link href="/pioneers">Pioneers</Link><Link href="/privacy">Privacy</Link><Link href="/support">Support</Link><a href="#top">Back to top</a><span>© 2026 LocalCheck</span></div>
-      </footer>
-
-      {notice ? <div className="toast" role="status">{notice}</div> : null}
+      <SiteFooter />
     </main>
   );
 }

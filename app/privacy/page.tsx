@@ -33,7 +33,7 @@ export default function PrivacyPolicy() {
         </div>
         <div className="legal-meta" aria-label="Policy publication details">
           <p><span>Effective date</span><strong>August 13, 2026</strong></p>
-          <p><span>Operator</span><strong>Jesse Herrig</strong></p>
+          <p><span>Contact</span><strong>localchecksports@gmail.com</strong></p>
         </div>
       </section>
 
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
 
         <article className="legal-copy">
           <p className="legal-intro">
-            LocalCheck is operated by Jesse Herrig. This Privacy Policy explains how LocalCheck
+            This Privacy Policy explains how LocalCheck
             (&ldquo;LocalCheck,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) collects, uses, shares, and protects information
             when you use the LocalCheck mobile application, website, and related services.
           </p>
@@ -190,7 +190,6 @@ export default function PrivacyPolicy() {
               For questions or requests about this policy or LocalCheck&apos;s privacy practices, contact:
             </p>
             <address>
-              <strong>Jesse Herrig</strong>
               <span>LocalCheck</span>
               <a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a>
             </address>
