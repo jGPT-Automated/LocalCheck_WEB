@@ -102,6 +102,8 @@ test("keeps the homepage hero focused on useful destinations", async () => {
   assert.equal(response.status, 200);
   assert.doesNotMatch(html, /aria-label=["']LocalCheck launch court summary["']/i);
   assert.doesNotMatch(html, /<button[^>]*>[^<]*Explore competition/i);
+  assert.match(html, /data-live-market-count=["']true["']/i);
+  assert.match(html, /class=["']hero__activity["']/i);
 
   const qrCard = html.match(/<a[^>]*class=["'][^"']*qr-card[^"']*["'][^>]*>[\s\S]*?<\/a>/i)?.[0] ?? "";
   assert.match(qrCard, /Scan to preview the app/i);

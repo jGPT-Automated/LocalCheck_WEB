@@ -14,6 +14,7 @@ import {
   UsersThree,
 } from "@phosphor-icons/react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -98,6 +99,7 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
 
 export default function HomeView({ stats, initialCourts }: { stats: CourtStats; initialCourts: ExplorerCourt[] }) {
   const heroRef = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
   const [counts, setCounts] = useState<CourtStats>(stats);
   const [featured, setFeatured] = useState(() => selectFeaturedCourts(initialCourts));
 
@@ -163,11 +165,24 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
       <section className="hero" ref={heroRef}>
         <img className="hero__art" src="/hero-map.png" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
         <div className="hero__veil" aria-hidden="true" />
+        <div className="hero__activity" aria-hidden="true"><span /><span /><span /></div>
 
         <SiteHeader />
 
         <div className="hero__copy">
-          <span className="hero__eyebrow"><i /> {counts.markets} cities now mapped</span>
+          <span className="hero__eyebrow">
+            <i />
+            <motion.strong
+              data-live-market-count="true"
+              key={counts.markets}
+              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+              animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {counts.markets}
+            </motion.strong>
+            cities now mapped
+          </span>
           <h1>Find<br />your<br />run<span>.</span></h1>
           <p>Live courts. Real competition.</p>
           <div className="hero__actions">
