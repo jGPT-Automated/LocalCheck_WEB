@@ -1,11 +1,8 @@
 "use client";
 
 import {
-  ArrowLeft,
   ArrowRight,
   Basketball,
-  Check,
-  CornersOut,
   MapPin,
   NavigationArrow,
   PingPong,
@@ -13,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { SiteHeader } from "@/components/site-header";
 import type { CourtDetail } from "./court-data";
 import WeeklyHeatmap from "./weekly-heatmap";
 
@@ -110,13 +108,7 @@ export default function CourtPageClient({
 
   return (
     <main className={`court-page court-page--${sportClass}`}>
-      <header className="court-page__nav">
-        <Link className="court-page__brand" href="/" aria-label="LocalCheck home">
-          <span><CornersOut size={30} /><Check size={15} weight="bold" /></span>
-          <b>LOCALCHECK</b>
-        </Link>
-        <Link className="court-page__back" href="/courts"><ArrowLeft size={17} weight="bold" /> Back to explore</Link>
-      </header>
+      <SiteHeader />
 
       <section className="court-page__hero">
         <div className="court-page__overview">

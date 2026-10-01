@@ -1,6 +1,6 @@
-import { ArrowLeft, Check, CornersOut } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SiteBrand, SiteHeader } from "@/components/site-header";
 import { breadcrumbSchema, jsonLd } from "../../lib/structured-data";
 
 export const metadata: Metadata = {
@@ -29,18 +29,6 @@ const sections = [
   ["contact", "Contact us"],
 ] as const;
 
-function PageBrand() {
-  return (
-    <Link className="brand brand--compact" href="/" aria-label="LocalCheck home">
-      <span className="brand__mark" aria-hidden="true">
-        <CornersOut size={27} weight="regular" />
-        <Check className="brand__check" size={14} weight="bold" />
-      </span>
-      <span className="brand__word">LOCALCHECK</span>
-    </Link>
-  );
-}
-
 export default function TermsPage() {
   return (
     <main className="legal-page" id="top">
@@ -54,13 +42,7 @@ export default function TermsPage() {
         )}
       />
 
-      <header className="legal-header">
-        <PageBrand />
-        <Link className="legal-back" href="/" aria-label="Back to LocalCheck">
-          <ArrowLeft size={16} weight="bold" />
-          <span className="legal-back__label">Back to LocalCheck</span>
-        </Link>
-      </header>
+      <SiteHeader />
 
       <section className="legal-hero" aria-labelledby="page-title">
         <div>
@@ -326,7 +308,7 @@ export default function TermsPage() {
       </div>
 
       <footer className="legal-footer">
-        <PageBrand />
+        <SiteBrand compact />
         <Link href="#top">Back to top</Link>
         <span>© 2026 LocalCheck</span>
       </footer>

@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  ArrowLeft,
   ArrowRight,
   Basketball,
   Check,
-  CornersOut,
   Crosshair,
   MagnifyingGlass,
   MapPin,
@@ -16,6 +14,7 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SiteHeader } from "@/components/site-header";
 import type { ExplorerCourt, CourtSport } from "./supabase-courts";
 import styles from "./explorer.module.css";
 
@@ -574,17 +573,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
 
   return (
     <main className={styles.page}>
-      <header className={styles.nav}>
-        <Link className={styles.brand} href="/" aria-label="LocalCheck home">
-          <span><CornersOut size={31} /><Check size={15} weight="bold" /></span>
-          <b>LOCALCHECK</b>
-        </Link>
-        <div className={styles.navCenter}>
-          <span><i /> Source-backed launch set</span>
-          <strong>{markets.length} cities · {courts.length.toLocaleString()} courts</strong>
-        </div>
-        <Link className={styles.back} href="/"><ArrowLeft size={16} weight="bold" /> Back home</Link>
-      </header>
+      <SiteHeader />
 
       <div className={styles.shell} data-detent={detent}>
         <aside
