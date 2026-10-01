@@ -498,7 +498,7 @@ a:focus-visible {
 .qr-card {
   position: absolute;
   z-index: 3;
-  right: clamp(30px, 4.8vw, 82px);
+  right: clamp(20px, 3vw, 40px);
   bottom: 35px;
   display: flex;
   width: 90px;
