@@ -95,6 +95,35 @@ test("renders the canonical community platform message on the homepage", async (
   assert.match(html, /one shared platform for local courts, activity, and competition/i);
 });
 
+test("keeps the homepage hero focused on useful destinations", async () => {
+  const response = await render("/");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(html, /aria-label=["']LocalCheck launch court summary["']/i);
+  assert.doesNotMatch(html, /<button[^>]*>[^<]*Explore competition/i);
+
+  const qrCard = html.match(/<a[^>]*class=["'][^"']*qr-card[^"']*["'][^>]*>[\s\S]*?<\/a>/i)?.[0] ?? "";
+  assert.match(qrCard, /Scan to preview the app/i);
+  assert.doesNotMatch(qrCard, /<svg/i);
+});
+
+test("renders an intentional homepage footer with real destinations", async () => {
+  const response = await render("/");
+  const html = await response.text();
+  const footer = html.match(/<footer[^>]*data-site-footer=["']true["'][^>]*>[\s\S]*?<\/footer>/i)?.[0] ?? "";
+
+  assert.equal(response.status, 200);
+  assert.match(footer, /href=["']\/courts["'][^>]*>Courts</i);
+  assert.match(footer, /href=["']\/app["'][^>]*>The app</i);
+  assert.match(footer, /href=["']\/how-it-works["'][^>]*>How it works</i);
+  assert.match(footer, /href=["']\/pioneers["'][^>]*>Pioneers</i);
+  assert.match(footer, /href=["']\/support["'][^>]*>Support</i);
+  assert.match(footer, /href=["']\/privacy["'][^>]*>Privacy</i);
+  assert.match(footer, /href=["']\/terms["'][^>]*>Terms</i);
+  assert.match(footer, /href=["']https:\/\/x\.com\/LocalCheckSport["']/i);
+});
+
 test("renders one consistent site header on every public page", async () => {
   const routes = [
     "/",
@@ -114,10 +143,12 @@ test("renders one consistent site header on every public page", async () => {
 
     assert.equal(response.status, 200, route);
     const header = sharedHeader(html);
-    assert.match(header, /href=["']\/app#heatmap["'][^>]*>Heatmap</i, route);
-    assert.match(header, /href=["']\/app#competition["'][^>]*>Competition</i, route);
-    assert.match(header, /href=["']\/app#verify["'][^>]*>Add a court</i, route);
-    assert.match(header, /href=["']\/pioneers["'][^>]*>Pioneers</i, route);
+    assert.match(header, /href=["']\/courts["'][^>]*>Courts</i, route);
+    assert.match(header, /href=["']\/how-it-works["'][^>]*>How it works</i, route);
+    assert.doesNotMatch(header, />Heatmap</i, route);
+    assert.doesNotMatch(header, />Competition</i, route);
+    assert.doesNotMatch(header, />Add a court</i, route);
+    assert.doesNotMatch(header, />Pioneers</i, route);
   }
 });
 

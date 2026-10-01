@@ -17,10 +17,8 @@ import {
 import styles from "./site-header.module.css";
 
 const SITE_NAV_ITEMS = [
-  { href: "/app#heatmap", label: "Heatmap" },
-  { href: "/app#competition", label: "Competition" },
-  { href: "/app#verify", label: "Add a court" },
-  { href: "/pioneers", label: "Pioneers" },
+  { href: "/courts", label: "Courts" },
+  { href: "/how-it-works", label: "How it works" },
 ] as const;
 
 const DEFAULT_CTA = { href: "/app", label: "Explore the app" } as const;
@@ -75,7 +73,7 @@ function MobileNavigation({ cta }: { cta: HeaderCta }) {
       <SheetContent className={styles.mobileSheet}>
         <SheetHeader className={styles.mobileSheetHeader}>
           <SheetTitle><SiteBrand compact /></SheetTitle>
-          <SheetDescription>Courts, activity, competition, and the people building the local scene.</SheetDescription>
+          <SheetDescription>Find a court, understand the app, and see how the local run comes together.</SheetDescription>
         </SheetHeader>
         <nav className={styles.mobileNav} aria-label="Mobile navigation">
           {SITE_NAV_ITEMS.map((item, index) => (
