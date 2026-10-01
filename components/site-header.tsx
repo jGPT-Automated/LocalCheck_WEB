@@ -23,6 +23,13 @@ const SITE_NAV_ITEMS = [
   { href: "/pioneers", label: "Pioneers" },
 ] as const;
 
+const DEFAULT_CTA = { href: "/app", label: "Explore the app" } as const;
+
+type HeaderCta = {
+  href: string;
+  label: string;
+};
+
 export function SiteBrand({ compact = false }: { compact?: boolean }) {
   return (
     <Link
@@ -39,20 +46,20 @@ export function SiteBrand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function DesktopNavigation() {
+function DesktopNavigation({ cta }: { cta: HeaderCta }) {
   return (
     <nav className={styles.desktopNav} aria-label="Primary navigation">
       {SITE_NAV_ITEMS.map((item) => (
         <Link key={item.href} href={item.href}>{item.label}</Link>
       ))}
       <Button asChild className={styles.headerCta}>
-        <Link href="/courts">Find a court <ArrowRightIcon size={17} /></Link>
+        <Link href={cta.href}>{cta.label} <ArrowRightIcon size={17} /></Link>
       </Button>
     </nav>
   );
 }
 
-function MobileNavigation() {
+function MobileNavigation({ cta }: { cta: HeaderCta }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -77,7 +84,7 @@ function MobileNavigation() {
             </SheetClose>
           ))}
           <SheetClose asChild>
-            <Link href="/courts" className={styles.mobileCta}>Find a court <ArrowRightIcon size={18} /></Link>
+            <Link href={cta.href} className={styles.mobileCta}>{cta.label} <ArrowRightIcon size={18} /></Link>
           </SheetClose>
         </nav>
       </SheetContent>
@@ -85,13 +92,13 @@ function MobileNavigation() {
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ cta = DEFAULT_CTA }: { cta?: HeaderCta }) {
   return (
     <header className={styles.root} data-site-header="true">
       <div className={styles.inner}>
         <SiteBrand />
-        <DesktopNavigation />
-        <MobileNavigation />
+        <DesktopNavigation cta={cta} />
+        <MobileNavigation cta={cta} />
       </div>
     </header>
   );

@@ -93,7 +93,7 @@ export function AppOverview() {
     <main className={styles.page} data-app-overview="true">
       <section className={styles.hero}>
         <div className={styles.heroGrid} aria-hidden="true" />
-        <SiteHeader />
+        <SiteHeader cta={{ href: "/courts", label: "Find a court" }} />
 
         <div className={styles.heroInner}>
           <motion.div

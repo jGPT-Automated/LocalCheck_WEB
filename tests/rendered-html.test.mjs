@@ -25,6 +25,12 @@ async function render(pathname = "/") {
   );
 }
 
+function sharedHeader(html) {
+  const match = html.match(/<header[^>]*data-site-header=["']true["'][^>]*>[\s\S]*?<\/header>/i);
+  assert.ok(match, "shared site header is present");
+  return match[0];
+}
+
 test("renders development preview metadata", async () => {
   const response = await render();
 
@@ -107,13 +113,22 @@ test("renders one consistent site header on every public page", async () => {
     const html = await response.text();
 
     assert.equal(response.status, 200, route);
-    assert.match(html, /data-site-header=["']true["']/i, route);
-    assert.match(html, /href=["']\/app#heatmap["'][^>]*>Heatmap</i, route);
-    assert.match(html, /href=["']\/app#competition["'][^>]*>Competition</i, route);
-    assert.match(html, /href=["']\/app#verify["'][^>]*>Add a court</i, route);
-    assert.match(html, /href=["']\/pioneers["'][^>]*>Pioneers</i, route);
-    assert.match(html, /href=["']\/courts["'][^>]*>Find a court/i, route);
+    const header = sharedHeader(html);
+    assert.match(header, /href=["']\/app#heatmap["'][^>]*>Heatmap</i, route);
+    assert.match(header, /href=["']\/app#competition["'][^>]*>Competition</i, route);
+    assert.match(header, /href=["']\/app#verify["'][^>]*>Add a court</i, route);
+    assert.match(header, /href=["']\/pioneers["'][^>]*>Pioneers</i, route);
   }
+});
+
+test("uses one CTA component with intentional page-specific text and destinations", async () => {
+  const homeHeader = sharedHeader(await (await render("/")).text());
+  const appHeader = sharedHeader(await (await render("/app")).text());
+
+  assert.match(homeHeader, /href=["']\/app["'][^>]*>Explore the app/i);
+  assert.doesNotMatch(homeHeader, /href=["']\/courts["'][^>]*>Find a court/i);
+  assert.match(appHeader, /href=["']\/courts["'][^>]*>Find a court/i);
+  assert.doesNotMatch(appHeader, /href=["']\/app["'][^>]*>Explore the app/i);
 });
 
 test("renders the shared site header on the custom not-found page", async () => {
