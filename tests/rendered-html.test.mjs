@@ -137,6 +137,22 @@ test("keeps the privacy contact brand-level", async () => {
   assert.doesNotMatch(html, /Jesse Herrig/i);
 });
 
+test("renders product-accurate, human-readable terms", async () => {
+  const response = await render("/terms");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /Terms at a glance/i);
+  assert.match(html, /automatically renews/i);
+  assert.match(html, /manage or cancel through your Apple subscriptions/i);
+  assert.match(html, /Restore Purchases/i);
+  assert.match(html, /RevenueCat/i);
+  assert.match(html, /does not reserve a court/i);
+  assert.match(html, /LocalCheck does not conduct background checks/i);
+  assert.match(html, /data-site-footer=["']true["']/i);
+  assert.doesNotMatch(html, /Jesse Herrig/i);
+});
+
 test("renders one consistent site header on every public page", async () => {
   const routes = [
     "/",
