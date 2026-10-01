@@ -116,14 +116,19 @@ test("renders an intentional homepage footer with real destinations", async () =
   const footer = html.match(/<footer[^>]*data-site-footer=["']true["'][^>]*>[\s\S]*?<\/footer>/i)?.[0] ?? "";
 
   assert.equal(response.status, 200);
-  assert.match(footer, /href=["']\/courts["'][^>]*>Courts</i);
-  assert.match(footer, /href=["']\/app["'][^>]*>The app</i);
-  assert.match(footer, /href=["']\/how-it-works["'][^>]*>How it works</i);
-  assert.match(footer, /href=["']\/pioneers["'][^>]*>Pioneers</i);
-  assert.match(footer, /href=["']\/support["'][^>]*>Support</i);
+  assert.doesNotMatch(footer, /href=["']\/(courts|app|how-it-works|pioneers)["']/i);
+  assert.match(footer, /href=["']\/support["'][^>]*>Help</i);
   assert.match(footer, /href=["']\/privacy["'][^>]*>Privacy</i);
   assert.match(footer, /href=["']\/terms["'][^>]*>Terms</i);
-  assert.match(footer, /href=["']https:\/\/x\.com\/LocalCheckSport["']/i);
+});
+
+test("keeps the privacy contact brand-level", async () => {
+  const response = await render("/privacy");
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /localchecksports@gmail\.com/i);
+  assert.doesNotMatch(html, /Jesse Herrig/i);
 });
 
 test("renders one consistent site header on every public page", async () => {
