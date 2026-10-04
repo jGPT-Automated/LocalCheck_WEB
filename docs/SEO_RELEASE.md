@@ -41,7 +41,9 @@ verified from page HTML. Search Console access is needed to diagnose exclusions.
   Unverified courts no longer get an unconditional “Verified place” map label.
 - JSON-LD serialization escapes `<` to prevent source text ending script elements.
 - Optional Cloudflare imports stay external in the Node webpack build, preserving
-  the process.env fallback. Sites continues to build with vinext.
+  the process.env fallback. Sites continues to build with vinext. An explicit
+  empty `turbopack` configuration also preserves Vercel's default `next build`
+  command: Next.js 16 otherwise rejects a webpack-only configuration.
 
 ## Verify and deploy
 
@@ -50,12 +52,14 @@ npm ci
 npm run lint
 npm test
 npm run build:next
+npx next build
 node scripts/seo-audit.mjs https://localchecksports.com audit.json
 ```
 
-`npm run build` creates the Sites Worker artifact. A Vercel/Node deployment must
-use `npm run build:next`, which creates `.next`, and `next start` for local
-production verification. Do not deploy the Sites artifact as a Next.js build.
+`npm run build` creates the Sites Worker artifact. Vercel's existing `next build`
+command uses Turbopack and creates `.next`. `npm run build:next` is an optional
+webpack build for Node; `next start` runs either Next.js artifact locally.
+Do not deploy the Sites artifact as a Next.js build.
 Use the existing production host and environment configuration. This repository
 change does not move the domain or change hosting-account settings.
 
