@@ -1,10 +1,9 @@
 import { EnvelopeSimple, XLogo } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import Link from "next/link";
 import { SiteBrand, SiteHeader } from "@/components/site-header";
 import {
-  COMMUNITY_PROMISE,
-  PRODUCT_EXPLANATION,
   SUPPORT_EMAIL,
   X_HANDLE,
   X_URL,
@@ -12,7 +11,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Support | LocalCheck",
-  description: `${COMMUNITY_PROMISE} Get app help, report an issue, or share an idea.`,
+  description: "Get LocalCheck app help, report a missing or incorrect court, manage your account, and contact support about check-ins, privacy, or verification.",
   alternates: { canonical: "/support" },
 };
 
@@ -28,6 +27,7 @@ export default function SupportPage() {
   return (
     <main className="legal-page" id="top">
       <SiteHeader />
+      <Breadcrumbs trail={[{ name: "LocalCheck", path: "/" }, { name: "Support", path: "/support" }]} />
 
       <section className="legal-hero" aria-labelledby="support-title">
         <div>
@@ -36,8 +36,7 @@ export default function SupportPage() {
             Support<span>.</span>
           </h1>
           <p className="legal-intro">
-            {COMMUNITY_PROMISE} {PRODUCT_EXPLANATION} Need app help, want to report a problem,
-            or have an idea? You&rsquo;re in the right place.
+            Get help with the app, report a court listing, or ask about your account.
           </p>
         </div>
         <div className="legal-meta" aria-label="Support contact details">

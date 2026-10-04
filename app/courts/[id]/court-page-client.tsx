@@ -71,7 +71,7 @@ function CourtMap({ court, token }: { court: CourtDetail; token: string }) {
         </div>
       ) : null}
       <div className="court-map__topline">
-        <span><i /> Verified place</span>
+        <span><i /> {court.details.some((detail) => detail.label === "Status" && detail.value === "Source verified") ? "Source verified" : "Court listing"}</span>
         <span>{court.neighborhood}</span>
       </div>
       <div className="court-map__caption">
@@ -95,12 +95,16 @@ export default function CourtPageClient({
   todayIso,
   plannedAt,
   scheduleDataAvailable,
+  breadcrumbs,
+  sourceLink,
 }: {
   court: CourtDetail;
   mapboxToken: string;
   todayIso: string;
   plannedAt: string[];
   scheduleDataAvailable: boolean;
+  breadcrumbs: React.ReactNode;
+  sourceLink: React.ReactNode;
 }) {
   const sportClass = court.sport.toLowerCase();
   const SportIcon = court.sport === "Basketball" ? Basketball : PingPong;
@@ -109,12 +113,14 @@ export default function CourtPageClient({
   return (
     <main className={`court-page court-page--${sportClass}`}>
       <SiteHeader />
+      {breadcrumbs}
 
       <section className="court-page__hero">
         <div className="court-page__overview">
           <span className="court-page__sport"><SportIcon size={17} weight="fill" /> {court.sport} · {court.neighborhood}</span>
           <h1>{court.name}</h1>
           <p className="court-page__address"><MapPin size={16} weight="fill" /> {court.address}<i />{distanceLabel}</p>
+          {sourceLink}
 
           <div className="court-page__signals">
             <div className="court-page__signal court-page__signal--live">

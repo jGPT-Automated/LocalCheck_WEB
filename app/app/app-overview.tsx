@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import { Trophy } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +25,7 @@ import { MapPinIcon } from "@/components/ui/map-pin";
 import { SwitchCameraIcon } from "@/components/ui/switch-camera";
 import { SiteBrand, SiteHeader } from "@/components/site-header";
 import { PRODUCT_EXPLANATION, PUBLIC_PROMISE } from "@/lib/messaging";
+import { APP_FAQS } from "@/lib/app-faqs";
 import styles from "./app-overview.module.css";
 
 type ScreenProps = {
@@ -50,8 +50,8 @@ function ProductScreen({ src, alt, className = "", priority = false, wide = fals
       <Image
         src={src}
         alt={alt}
-        width={wide ? 1580 : 1179}
-        height={wide ? 3504 : 2556}
+        width={src.includes("add-court-photo") ? 709 : wide ? 1580 : 1179}
+        height={src.includes("add-court-photo") ? 1536 : wide ? 3504 : 2556}
         priority={priority}
         unoptimized
         sizes="(max-width: 760px) 58vw, (max-width: 1100px) 32vw, 360px"
@@ -62,19 +62,7 @@ function ProductScreen({ src, alt, className = "", priority = false, wide = fals
 }
 
 function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const reduced = useReducedMotion();
-
-  return (
-    <motion.div
-      className={className}
-      initial={reduced ? false : { opacity: 0, y: 26 }}
-      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.16 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 function Eyebrow({ index, children, light = false }: { index: string; children: React.ReactNode; light?: boolean }) {
@@ -86,24 +74,21 @@ function Eyebrow({ index, children, light = false }: { index: string; children: 
   );
 }
 
-export function AppOverview() {
-  const reduced = useReducedMotion();
+export function AppOverview({ breadcrumbs }: { breadcrumbs: React.ReactNode }) {
 
   return (
     <main className={styles.page} data-app-overview="true">
       <section className={styles.hero}>
         <div className={styles.heroGrid} aria-hidden="true" />
         <SiteHeader cta={{ href: "/courts", label: "Find a court" }} />
+        {breadcrumbs}
 
         <div className={styles.heroInner}>
-          <motion.div
+          <div
             className={styles.heroCopy}
-            initial={reduced ? false : { opacity: 0, y: 24 }}
-            animate={reduced ? undefined : { opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
             <Badge className={styles.liveBadge}><span /> THE LOCALCHECK APP</Badge>
-            <h1>KNOW WHERE.<br />KNOW WHEN.<br /><em>PLAY FOR SOMETHING.</em></h1>
+            <h1>FIND A COURT.<br />PLAN A GAME.<br /><em>SEE WHO’S GOING.</em></h1>
             <p>
               {PUBLIC_PROMISE} {PRODUCT_EXPLANATION}
             </p>
@@ -120,34 +105,31 @@ export function AppOverview() {
               <span><CircleCheckIcon size={17} /> Reviewed results</span>
               <span><CircleCheckIcon size={17} /> Local context</span>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
+          <div
             className={styles.heroPhones}
-            initial={reduced ? false : { opacity: 0, x: 34 }}
-            animate={reduced ? undefined : { opacity: 1, x: 0 }}
-            transition={{ duration: 0.72, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
           >
             <ProductScreen
-              src="/app-screens/heatmap.png"
+              src="/app-screens/heatmap.webp"
               alt="LocalCheck weekly Who's Going heatmap showing planned attendance and scheduled games"
               className={styles.heroPhoneBack}
               priority
             />
             <ProductScreen
-              src="/app-screens/home-feed.png"
+              src="/app-screens/home-feed.webp"
               alt="LocalCheck court home feed with check in, locals, visits, and recent activity"
               className={styles.heroPhoneFront}
               priority
             />
             <ProductScreen
-              src="/app-screens/leaderboard.png"
+              src="/app-screens/leaderboard.webp"
               alt="LocalCheck regional basketball Elo leaderboard"
               className={styles.heroPhoneSide}
               priority
             />
             <span className={styles.heroAnnotation}>ACTUAL APP SCREENS</span>
-          </motion.div>
+          </div>
         </div>
 
         <div className={styles.journeyStrip}>
@@ -201,7 +183,7 @@ export function AppOverview() {
           <Reveal className={styles.heatmapVisual}>
             <div className={styles.visualLabel}>WEEKLY COURT INTENT</div>
             <ProductScreen
-              src="/app-screens/heatmap.png"
+              src="/app-screens/heatmap.webp"
               alt="Weekly LocalCheck heatmap with quiet-to-busy cells, a game marker, and a selected time"
               className={styles.heatmapPhone}
             />
@@ -234,7 +216,7 @@ export function AppOverview() {
                 <p>Explore nearby courts, open the one you care about, and see its local activity instead of guessing from an old directory listing.</p>
                 <ul><li>Verified court records</li><li>Map and list discovery</li><li>Locals, visits, and court activity</li></ul>
               </div>
-              <ProductScreen src="/app-screens/explore-map.png" alt="LocalCheck Explore map for finding nearby courts" />
+              <ProductScreen src="/app-screens/explore-map.webp" alt="LocalCheck Explore map for finding nearby courts" />
             </TabsContent>
             <TabsContent value="organize" className={styles.useCasePanel}>
               <div className={styles.useCaseCopy}>
@@ -243,7 +225,7 @@ export function AppOverview() {
                 <p>Create a game at a court, choose the format and time, and let players join until the run is full.</p>
                 <ul><li>2v2, 3v3, 5v5, or custom play</li><li>Open spots and joined players</li><li>One shared court and start time</li></ul>
               </div>
-              <ProductScreen src="/app-screens/game-roster.png" alt="LocalCheck scheduled game roster with open spots and joined players" />
+              <ProductScreen src="/app-screens/game-roster.webp" alt="LocalCheck scheduled game roster with open spots and joined players" />
             </TabsContent>
             <TabsContent value="build" className={styles.useCasePanel}>
               <div className={styles.useCaseCopy}>
@@ -255,7 +237,7 @@ export function AppOverview() {
                   <Link href="/pioneers">Meet the Pioneers <ArrowRightIcon size={17} /></Link>
                 </Button>
               </div>
-              <ProductScreen src="/app-screens/add-court-success.png" alt="Successful verified court submission in LocalCheck" />
+              <ProductScreen src="/app-screens/add-court-success.webp" alt="Successful verified court submission in LocalCheck" />
             </TabsContent>
           </Tabs>
         </div>
@@ -264,13 +246,13 @@ export function AppOverview() {
       <section className={styles.gameSection}>
         <div className={styles.sectionInner}>
           <Reveal className={styles.gameVisuals}>
-            <ProductScreen src="/app-screens/schedule-going.png" alt="LocalCheck schedule with planned time and a scheduled game" className={styles.gamePhoneOne} />
-            <ProductScreen src="/app-screens/game-roster.png" alt="LocalCheck game roster showing joined players and open positions" className={styles.gamePhoneTwo} />
+            <ProductScreen src="/app-screens/schedule-going.webp" alt="LocalCheck schedule with planned time and a scheduled game" className={styles.gamePhoneOne} />
+            <ProductScreen src="/app-screens/game-roster.webp" alt="LocalCheck game roster showing joined players and open positions" className={styles.gamePhoneTwo} />
           </Reveal>
           <Reveal className={styles.gameCopy}>
             <Eyebrow index="04">MAKE IT A GAME</Eyebrow>
             <h2>FROM A TIME SLOT<br />TO A <em>REAL ROSTER.</em></h2>
-            <p className={styles.lede}>Intent is lightweight. A scheduled game is specific. Choose the court, time, and format, then give players one place to join.</p>
+            <p className={styles.lede}>Choose a court, time, and game format. Players can join the roster and see which spots are open.</p>
             <ol className={styles.stepList}>
               <li><span>01</span><div><strong>Choose a court and time</strong><p>The game lives where the run actually happens.</p></div></li>
               <li><span>02</span><div><strong>Set the format</strong><p>Make the number of spots and open positions clear.</p></div></li>
@@ -292,8 +274,8 @@ export function AppOverview() {
 
           <div className={styles.eloStory}>
             <Reveal className={styles.eloPhones}>
-              <ProductScreen src="/app-screens/leaderboard.png" alt="LocalCheck local and regional Elo leaderboard" className={styles.eloPhonePrimary} />
-              <ProductScreen src="/app-screens/final-score-detail.png" alt="Finalized LocalCheck game result with Elo change" className={styles.eloPhoneSecondary} wide />
+              <ProductScreen src="/app-screens/leaderboard.webp" alt="LocalCheck local and regional Elo leaderboard" className={styles.eloPhonePrimary} />
+              <ProductScreen src="/app-screens/final-score-detail.webp" alt="Finalized LocalCheck game result with Elo change" className={styles.eloPhoneSecondary} wide />
             </Reveal>
 
             <Reveal className={styles.eloExplainer}>
@@ -339,7 +321,7 @@ export function AppOverview() {
         <div className={styles.verifyInner}>
           <Reveal className={styles.verifyCopy}>
             <Eyebrow index="06">GROW THE MAP</Eyebrow>
-            <h2>VERIFY A COURT.<br /><em>LEAVE A REAL PLACE BEHIND.</em></h2>
+            <h2>ADD A COURT.<br /><em>VERIFY IT ON SITE.</em></h2>
             <p className={styles.lede}>
               When a court is missing, LocalCheck asks you to prove you are there. Location is locked on site, the camera opens live, and the submission is checked before the court joins the public map.
             </p>
@@ -356,9 +338,9 @@ export function AppOverview() {
           </Reveal>
 
           <Reveal className={styles.verifyPhones}>
-            <ProductScreen src="/app-screens/add-court-start.png" alt="Start of the LocalCheck add-a-court verification flow" className={styles.verifyPhoneStart} />
-            <ProductScreen src="/app-screens/add-court-photo.png" alt="LocalCheck live camera step framing a real court" className={styles.verifyPhonePhoto} />
-            <ProductScreen src="/app-screens/add-court-ai.png" alt="LocalCheck court submission verification step" className={styles.verifyPhoneAi} />
+            <ProductScreen src="/app-screens/add-court-start.webp" alt="Start of the LocalCheck add-a-court verification flow" className={styles.verifyPhoneStart} />
+            <ProductScreen src="/app-screens/add-court-photo.webp" alt="LocalCheck live camera step framing a real court" className={styles.verifyPhonePhoto} />
+            <ProductScreen src="/app-screens/add-court-ai.webp" alt="LocalCheck court submission verification step" className={styles.verifyPhoneAi} />
           </Reveal>
         </div>
       </section>
@@ -367,12 +349,12 @@ export function AppOverview() {
         <div className={styles.identityInner}>
           <Reveal className={styles.identityCopy}>
             <Eyebrow index="07" light>YOUR LOCAL RECORD</Eyebrow>
-            <h2>YOUR PROFILE ISN&apos;T A BIO.<br /><em>IT&apos;S WHAT YOU DID.</em></h2>
+            <h2>YOUR COURTS.<br /><em>YOUR GAME HISTORY.</em></h2>
             <p>Visits, court activity, settled games, and competitive standing create a record rooted in real local play.</p>
           </Reveal>
           <Reveal className={styles.identityPhones}>
-            <ProductScreen src="/app-screens/my-profile.png" alt="LocalCheck player profile and activity history" />
-            <ProductScreen src="/app-screens/local-legend.png" alt="LocalCheck Local Legend profile state" wide />
+            <ProductScreen src="/app-screens/my-profile.webp" alt="LocalCheck player profile and activity history" />
+            <ProductScreen src="/app-screens/local-legend.webp" alt="LocalCheck Local Legend profile state" wide />
           </Reveal>
         </div>
       </section>
@@ -384,24 +366,14 @@ export function AppOverview() {
             <h2>WHAT THE APP<br /><em>ACTUALLY KNOWS.</em></h2>
           </Reveal>
           <Reveal className={styles.faqContent}>
-            <Accordion type="single" collapsible defaultValue="heatmap">
-              <AccordionItem value="heatmap">
-                <AccordionTrigger>Is the heatmap live occupancy?</AccordionTrigger>
-                <AccordionContent>No. The weekly heatmap shows when players plan to go. Live check-ins are a separate current-court signal, and scheduled games are marked as organized events.</AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="elo">
-                <AccordionTrigger>Does a submitted score change Elo immediately?</AccordionTrigger>
-                <AccordionContent>No. A score enters review first. A finalized result updates the competitive record and Elo; a dispute pauses settlement.</AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="courts">
-                <AccordionTrigger>Can anyone add a court?</AccordionTrigger>
-                <AccordionContent>Players can submit a missing court from the app, but the flow checks location, possible duplicates, and a live on-site photo before the court is published.</AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="sports">
-                <AccordionTrigger>Which sports are shown?</AccordionTrigger>
-                <AccordionContent>LocalCheck currently presents basketball and pickleball court discovery, schedules, games, and leaderboards within their own local context.</AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            <div className={styles.appFaqs}>
+              {APP_FAQS.map((faq) => (
+                <details key={faq.question} open>
+                  <summary>{faq.question}</summary>
+                  <p>{faq.answer}</p>
+                </details>
+              ))}
+            </div>
           </Reveal>
         </div>
       </section>

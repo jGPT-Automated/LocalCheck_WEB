@@ -1,5 +1,7 @@
 import { ArrowRight, Camera, Check, MapPin, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { jsonLd } from "@/lib/structured-data";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteBrand, SiteHeader } from "@/components/site-header";
@@ -137,10 +139,11 @@ export default function PioneersPage() {
     <main className="legal-page" id="top">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={jsonLd(faqJsonLd)}
       />
 
       <SiteHeader />
+      <Breadcrumbs trail={[{ name: "LocalCheck", path: "/" }, { name: "Pioneers", path: "/pioneers" }]} />
 
       <section className="legal-hero pioneers-hero" aria-labelledby="pioneers-title">
         <PioneerCourtArt />
@@ -209,7 +212,7 @@ export default function PioneersPage() {
                 ))}
               </div>
               <figure className="pioneers-flow__screen">
-                <Image src="/app-screens/add-court-start.png" alt="LocalCheck app screen showing the add-a-court flow" width={709} height={1536} unoptimized />
+                <Image src="/app-screens/add-court-start.webp" alt="LocalCheck app screen showing the add-a-court flow" width={1179} height={2556} unoptimized />
                 <figcaption>From the LocalCheck app / Add a court</figcaption>
               </figure>
             </div>

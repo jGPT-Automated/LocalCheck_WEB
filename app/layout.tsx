@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "LocalCheck",
     images: [
       {
-        url: "/localcheck-logo-final-preview.png",
+        url: "/localcheck-logo-final-preview.webp",
         width: 5160,
         height: 808,
         alt: "LocalCheck",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `LocalCheck | ${BRAND_LINE}`,
     description: SITE_DESCRIPTION,
-    images: ["/localcheck-logo-final-preview.png"],
+    images: ["/localcheck-logo-final-preview.webp"],
   },
   robots: {
     index: true,

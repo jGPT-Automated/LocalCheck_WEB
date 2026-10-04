@@ -9,7 +9,7 @@ export const PUBLIC_PROMISE =
 export const PRODUCT_EXPLANATION =
   "See who is there now, who plans to play later, organize the run, and build trusted friend, court, and regional rankings from reviewed games.";
 
-export const SITE_DESCRIPTION = `${COMMUNITY_PROMISE} ${PRODUCT_EXPLANATION}`;
+export const SITE_DESCRIPTION = "Find basketball and pickleball courts with LocalCheck. Check court access and setup, see player check-ins, and plan your next pickup game.";
 
 export const SUPPORT_EMAIL = "localchecksports@gmail.com";
 export const X_HANDLE = "@LocalCheckSport";

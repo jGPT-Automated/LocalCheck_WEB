@@ -1,11 +1,12 @@
 import { cache } from "react";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import CourtPageClient from "./court-page-client";
 import type { CourtDetail } from "./court-data";
 import { loadCourtPlannedTimes, loadExplorerCourt } from "../supabase-courts";
 import { SITE_URL } from "../../../lib/site";
 import { breadcrumbSchema, courtSchema, jsonLd } from "../../../lib/structured-data";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 async function getMapboxToken() {
   try {
@@ -56,7 +57,7 @@ export async function generateMetadata({
       url: `${SITE_URL}/courts/${listing.slug}`,
       images: [
         {
-          url: "/localcheck-logo-final-preview.png",
+          url: "/localcheck-logo-final-preview.webp",
           width: 5160,
           height: 808,
           alt: listing.name,
@@ -68,7 +69,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${listing.name} — LocalCheck`,
       description,
-      images: ["/localcheck-logo-final-preview.png"],
+      images: ["/localcheck-logo-final-preview.webp"],
     },
   };
 }
@@ -78,6 +79,9 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
   const lookupId = resolveLookupId(id);
 
   const listing = await loadCourt(lookupId);
+  if (listing && id !== listing.slug) {
+    permanentRedirect(`/courts/${encodeURIComponent(listing.slug)}`);
+  }
   let court: CourtDetail | undefined;
 
   if (listing) {
@@ -131,6 +135,14 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
         )}
       />
       <CourtPageClient
+        breadcrumbs={<Breadcrumbs trail={[
+          { name: "LocalCheck", path: "/" },
+          { name: "Courts", path: "/courts" },
+          { name: listing.name, path: `/courts/${listing.slug}` },
+        ]} schema={false} />}
+        sourceLink={listing.sourceUrl && /^https?:\/\//i.test(listing.sourceUrl)
+          ? <p className="court-listing-source">Listing source: <a href={listing.sourceUrl} target="_blank" rel="noreferrer">Venue or parks information</a>. Confirm current access and hours with the venue.</p>
+          : null}
         court={court}
         mapboxToken={await getMapboxToken()}
         todayIso={todayIso}

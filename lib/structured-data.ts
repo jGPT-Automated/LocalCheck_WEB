@@ -12,7 +12,7 @@ export const ORG_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const APP_ID = `${SITE_URL}/#mobile-app`;
 
-const LOGO = `${SITE_URL}/localcheck-logo-final-preview.png`;
+const LOGO = `${SITE_URL}/localcheck-logo-final-preview.webp`;
 
 export function organizationSchema() {
   return {
@@ -193,5 +193,5 @@ export function breadcrumbSchema(trail: ReadonlyArray<{ name: string; path: stri
 
 /** Serialize for a <script type="application/ld+json"> tag. */
 export function jsonLd(schema: unknown) {
-  return { __html: JSON.stringify(schema) };
+  return { __html: JSON.stringify(schema).replace(/</g, "\\u003c") };
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -43,6 +44,7 @@ export default function PrivacyPolicy() {
   return (
     <main className="legal-page" id="top">
       <SiteHeader />
+      <Breadcrumbs trail={[{ name: "LocalCheck", path: "/" }, { name: "Privacy", path: "/privacy" }]} />
 
       <section className="legal-hero" aria-labelledby="privacy-title">
         <div>

@@ -22,6 +22,7 @@ type Filter = "all" | CourtSport;
 type MapState = "loading" | "ready" | "unavailable";
 
 type Props = {
+  breadcrumbs: React.ReactNode;
   initialCourts: ExplorerCourt[];
   mapboxToken: string;
   source: "supabase" | "curated";
@@ -104,7 +105,7 @@ function CourtListCard({
           <Metric value={court.liveCount} label="Live now" live />
           <Metric value={court.localCount} label="Locals" />
         </div>
-        <Link className={styles.cardLink} href={`/courts/${encodeURIComponent(court.id)}`} aria-label={`View ${court.name}`}>
+        <Link className={styles.cardLink} href={`/courts/${encodeURIComponent(court.slug)}`} aria-label={`View ${court.name}`}>
           <span>View court</span>
           <ArrowRight size={16} weight="bold" />
         </Link>
@@ -151,7 +152,7 @@ function mapBottomPadding(detent: SheetDetent, container: HTMLElement | null) {
   return Math.min(sheetVisible + 24, Math.round(mapHeight * 0.8));
 }
 
-export default function CourtExplorerClient({ initialCourts, mapboxToken, source }: Props) {
+export default function CourtExplorerClient({ initialCourts, mapboxToken, source, breadcrumbs }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("mapbox-gl").Map | null>(null);
   const mapboxRef = useRef<typeof import("mapbox-gl").default | null>(null);
@@ -597,6 +598,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             <i className={styles.sheetGrabber} aria-hidden="true" />
           </button>
           <div className={styles.sidebarHeader}>
+            {breadcrumbs}
             <span className={styles.eyebrow}><i /> Find your run</span>
             <div className={styles.titleRow}>
               <div><h1>Find a court.</h1><p>Your courts, activity, and competition in one shared place.</p></div>
@@ -667,7 +669,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
               <div>
                 <Metric value={selectedCourt.liveCount} label="Live now" live />
                 <Metric value={selectedCourt.localCount} label="Locals" />
-                <Link href={`/courts/${encodeURIComponent(selectedCourt.id)}`}>View court <ArrowRight size={16} weight="bold" /></Link>
+                <Link href={`/courts/${encodeURIComponent(selectedCourt.slug)}`}>View court <ArrowRight size={16} weight="bold" /></Link>
               </div>
             </article>
           ) : null}
