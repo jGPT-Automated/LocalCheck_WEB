@@ -94,6 +94,34 @@ a:focus-visible {
   outline-offset: 4px;
 }
 
+.breadcrumbs {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  font-size: 13px;
+}
+
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumbs li + li::before {
+  content: "/";
+  margin-right: 8px;
+  opacity: .5;
+}
+
+.breadcrumbs a { text-decoration: underline; text-underline-offset: 3px; }
+.court-listing-source { font-size: 13px; line-height: 1.6; color: #a5a5b0; }
+.court-listing-source a { text-decoration: underline; text-underline-offset: 3px; }
+
 .hero {
   --hero-shift: 0px;
   --hero-scale: 1;

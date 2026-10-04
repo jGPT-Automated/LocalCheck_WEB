@@ -50,7 +50,7 @@ test("renders the app overview with the real product story", async () => {
   assert.match(html, /THE LOCALCHECK APP/i);
   assert.match(html, /WHO'S GOING/i);
   assert.match(html, /HOW ELO MOVES/i);
-  assert.match(html, /VERIFY A COURT/i);
+  assert.match(html, /VERIFY IT ON SITE/i);
   assert.match(html, /data-app-overview=["']true["']/i);
 });
 
@@ -59,7 +59,7 @@ test("renders the launch-ready support identity without a personal operator", as
   const html = await response.text();
 
   assert.equal(response.status, 200);
-  assert.match(html, /one shared platform for their courts, activity, and competition/i);
+  assert.match(html, /Get help with the app, report a court listing/i);
   assert.match(html, /href=["']https:\/\/x\.com\/LocalCheckSport["']/i);
   assert.match(html, /@LocalCheckSport/i);
   assert.match(html, /data-support-footer=["']balanced["']/i);
@@ -233,7 +233,7 @@ test("shows court-specific artwork and the actual add-court flow on Pioneers", a
 
   assert.equal(response.status, 200);
   assert.match(html, /data-court-art="basketball"/);
-  assert.match(html, /src="\/app-screens\/add-court-start\.png"/);
+  assert.match(html, /src="\/app-screens\/add-court-start\.webp"/);
   assert.match(html, /alt="LocalCheck app screen showing the add-a-court flow"/);
 });
 
@@ -246,4 +246,91 @@ test("describes a free core app without contradicting the LocalPlus launch offer
   assert.doesNotMatch(how, /no in-app purchases, no subscription/i);
   assert.match(llms, /LocalPlus launch offers/i);
   assert.doesNotMatch(llms, /no purchases, no subscription|no in-app purchases/i);
+});
+
+test("serves compact WebP homepage artwork with reserved image dimensions", async () => {
+  const html = await (await render("/")).text();
+  const hero = html.match(/<img[^>]*class="hero__art"[^>]*>/)?.[0] ?? "";
+  assert.match(hero, /src="\/hero-map\.webp"/);
+  assert.match(hero, /width="1664"/);
+  assert.match(hero, /height="936"/);
+  assert.match(hero, /fetchPriority="high"/i);
+});
+
+test("redirects court aliases directly to the canonical court", async () => {
+  for (const [alias, slug] of [["basketball", "austin-basketball-hancock"], ["pickleball", "austin-pickleball-pan-am"]]) {
+    const response = await render(`/courts/${alias}`);
+    assert.equal(response.status, 308);
+    assert.equal(new URL(response.headers.get("location"), "http://localhost").pathname, `/courts/${slug}`);
+  }
+});
+
+test("shows navigable breadcrumbs and matching schema on public subpages", async () => {
+  for (const route of ["/app", "/courts", "/how-it-works", "/pioneers", "/support", "/privacy", "/terms", "/courts/austin-basketball-hancock"]) {
+    const html = await (await render(route)).text();
+    assert.match(html, /<nav[^>]*aria-label="Breadcrumb"/, route);
+    assert.match(html, /"@type":"BreadcrumbList"/, route);
+  }
+});
+
+test("app FAQ schema describes questions and answers visible in server HTML", async () => {
+  const html = await (await render("/app")).text();
+  const nodes = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
+  const faq = nodes.find((node) => node["@type"] === "FAQPage");
+  assert.ok(faq);
+  assert.equal(faq.mainEntity.length, 4);
+  for (const question of faq.mainEntity) {
+    assert.ok(html.includes(question.name), question.name);
+    assert.ok(html.includes(question.acceptedAnswer.text), question.name);
+  }
+  assert.doesNotMatch(html, /opacity:0/);
+});
+
+test("public pages have distinct descriptions, one H1 and self-referencing canonicals", async () => {
+  const descriptions = new Set();
+  for (const route of ["/", "/app", "/courts", "/how-it-works", "/pioneers", "/support", "/privacy", "/terms", "/courts/austin-basketball-hancock"]) {
+    const html = await (await render(route)).text();
+    assert.equal([...html.matchAll(/<h1[ >]/g)].length, 1, route);
+    assert.doesNotMatch(html, /<meta name="(?:robots|googlebot)" content="[^"]*noindex/, route);
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    assert.equal(canonical?.replace(/\/$/, ""), `https://localchecksports.com${route === "/" ? "" : route}`, route);
+    const description = html.match(/<meta name="description" content="([^"]+)"/)?.[1];
+    assert.ok(description, route);
+    assert.ok(!descriptions.has(description), `duplicate description: ${route}`);
+    descriptions.add(description);
+  }
+});
+
+test("court explorer links database records directly to readable canonical slugs", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalUrl = process.env.SUPABASE_URL;
+  const originalKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+  process.env.SUPABASE_URL = "https://seo-fixture.invalid";
+  process.env.SUPABASE_PUBLISHABLE_KEY = "test-publishable-key";
+  globalThis.fetch = async (input, ...args) => {
+    if (String(input).startsWith("https://seo-fixture.invalid/rest/v1/")) {
+      return Response.json([{
+        id: "12345678-1234-4234-8234-123456789012",
+        slug: "test-court-readable-slug",
+        name: "Test court",
+        sport: "basketball",
+        city: "Austin",
+        state: "TX",
+        latitude: 30.3,
+        longitude: -97.7,
+      }]);
+    }
+    return originalFetch(input, ...args);
+  };
+  try {
+    const html = await (await render("/courts")).text();
+    assert.match(html, /href="\/courts\/test-court-readable-slug"/);
+    assert.doesNotMatch(html, /href="\/courts\/12345678-1234-4234-8234-123456789012"/);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalUrl === undefined) delete process.env.SUPABASE_URL;
+    else process.env.SUPABASE_URL = originalUrl;
+    if (originalKey === undefined) delete process.env.SUPABASE_PUBLISHABLE_KEY;
+    else process.env.SUPABASE_PUBLISHABLE_KEY = originalKey;
+  }
 });

@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import Link from "next/link";
 import { SiteBrand, SiteHeader } from "@/components/site-header";
 import { loadExplorerCourts } from "../courts/supabase-courts";
 import { deriveCourtStats } from "../../lib/court-stats";
 import { breadcrumbSchema, faqSchema, jsonLd } from "../../lib/structured-data";
 import type { FaqItem } from "../../lib/structured-data";
-import { COMMUNITY_PROMISE, PRODUCT_EXPLANATION, SITE_DESCRIPTION } from "../../lib/messaging";
+import { COMMUNITY_PROMISE, PRODUCT_EXPLANATION } from "../../lib/messaging";
 
 export const revalidate = 180;
 
 export const metadata: Metadata = {
   title: "How LocalCheck Works | Heatmaps, Check-ins & Rankings",
-  description: SITE_DESCRIPTION,
+  description: "Learn how LocalCheck court check-ins, weekly plans, pickup games, score reviews, and Elo rankings work for basketball and pickleball players.",
   alternates: { canonical: "/how-it-works" },
   openGraph: {
     title: "How LocalCheck Works",
@@ -107,6 +108,7 @@ export default async function HowItWorksPage() {
       />
 
       <SiteHeader />
+      <Breadcrumbs trail={[{ name: "LocalCheck", path: "/" }, { name: "How it works", path: "/how-it-works" }]} schema={false} />
 
       <section className="legal-hero" aria-labelledby="page-title">
         <div>

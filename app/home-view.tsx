@@ -14,7 +14,7 @@ import {
   UsersThree,
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -99,7 +99,6 @@ function CourtCard({ court }: { court: ExplorerCourt }) {
 
 export default function HomeView({ stats, initialCourts }: { stats: CourtStats; initialCourts: ExplorerCourt[] }) {
   const heroRef = useRef<HTMLElement>(null);
-  const reducedMotion = useReducedMotion();
   const [counts, setCounts] = useState<CourtStats>(stats);
   const [featured, setFeatured] = useState(() => selectFeaturedCourts(initialCourts));
 
@@ -163,7 +162,7 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
   return (
     <main id="top">
       <section className="hero" ref={heroRef}>
-        <img className="hero__art" src="/hero-map.png" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
+        <img className="hero__art" src="/hero-map.webp" width="1664" height="936" alt="Dark topographic Austin map with live routes converging at a basketball court" fetchPriority="high" />
         <div className="hero__veil" aria-hidden="true" />
         <div className="hero__activity" aria-hidden="true"><span /><span /><span /></div>
 
@@ -175,8 +174,8 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
             <motion.strong
               data-live-market-count="true"
               key={counts.markets}
-              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-              animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+              initial={false}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
               {counts.markets}
@@ -195,7 +194,7 @@ export default function HomeView({ stats, initialCourts }: { stats: CourtStats; 
 
         <a className="qr-card" href="https://github.com/jGPT-Automated/LocalCheck_Expo" target="_blank" rel="noreferrer" aria-label="Preview the LocalCheck app project">
           <span>Scan to preview the app</span>
-          <img src="/qr-localcheck.png" alt="QR code for LocalCheck" width="78" height="78" />
+          <img src="/qr-localcheck.webp" alt="QR code for LocalCheck" width="78" height="78" />
         </a>
       </section>
 

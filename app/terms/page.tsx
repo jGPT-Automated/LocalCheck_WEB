@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -61,6 +62,7 @@ export default function TermsPage() {
       />
 
       <SiteHeader />
+      <Breadcrumbs trail={[{ name: "LocalCheck", path: "/" }, { name: "Terms", path: "/terms" }]} schema={false} />
 
       <section className="legal-hero" aria-labelledby="terms-title">
         <div>

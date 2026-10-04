@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import CourtExplorerClient from "./court-explorer-client";
 import { loadExplorerCourts } from "./supabase-courts";
 
@@ -24,6 +25,7 @@ export default async function CourtsPage() {
 
   return (
     <CourtExplorerClient
+      breadcrumbs={<Breadcrumbs trail={[{ name: "LocalCheck", path: "/" }, { name: "Courts", path: "/courts" }]} />}
       initialCourts={courtData.courts}
       mapboxToken={mapboxToken}
       source={courtData.source}
