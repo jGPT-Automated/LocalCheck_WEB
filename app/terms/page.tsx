@@ -68,7 +68,7 @@ export default function TermsPage() {
           <h1 id="terms-title">Terms of<br />Service<span>.</span></h1>
         </div>
         <div className="legal-meta" aria-label="Terms publication details">
-          <p><span>Effective date</span><strong>October 1, 2026</strong></p>
+          <p><span>Effective date</span><strong>October 7, 2026</strong></p>
           <p><span>Applies to</span><strong>LocalCheck app + website</strong></p>
         </div>
       </section>
@@ -209,7 +209,7 @@ export default function TermsPage() {
             <h2>LocalPlus and purchases</h2>
             <p>
               LocalCheck offers core court features for free and may offer optional LocalPlus
-              features through an auto-renewing monthly subscription. The app shows the current
+              features through auto-renewing monthly or yearly subscriptions. The app shows the current
               price, billing period, and included access before you confirm a purchase. Apple
               processes payment to your Apple ID; LocalCheck does not receive your full payment-card details.
             </p>

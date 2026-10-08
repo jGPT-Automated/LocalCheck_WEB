@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "How LocalCheck Works",
     description:
-      "The weekly heatmap, one-tap check-in, scheduled runs, friend, court, and regional rankings, and verified court submissions explained.",
+      "The weekly heatmap, check-in, friend challenges, casual invitations, reviewed rankings, hidden scores, and verified court submissions explained.",
     url: "/how-it-works",
     siteName: "LocalCheck",
     type: "website",
@@ -65,7 +65,7 @@ const faqs: readonly FaqItem[] = [
   {
     question: "What if my opponent logs the wrong score?",
     answer:
-      "Every submitted score goes to your opponent for review before it counts. They can approve it, or dispute it with a corrected score and a note. Disputed scores are held until both sides agree, and unresolved games can be voided rather than counted wrong.",
+      "Every submitted score enters review before it counts. The other players can approve it or dispute it. An undisputed pending score automatically confirms after three days. Disputed games are held for correction, and unresolved games are voided without changing ratings.",
   },
   {
     question: "How do I add a court that isn't listed?",
@@ -161,7 +161,8 @@ export default async function HowItWorksPage() {
               {stats.markets} cities at launch.
             </p>
             <p>
-              It is free, iOS-only, and there is nothing to buy inside it.
+              LocalCheck is free to download on iOS. Core court features are free, with optional
+              LocalPlus access through monthly or yearly subscriptions.
             </p>
           </section>
 
@@ -233,20 +234,38 @@ export default async function HowItWorksPage() {
             <span className="legal-section-number">06</span>
             <h2>Games, ratings, and disputes</h2>
             <p>
-              Log a game with the sport, court, date, matchup, and score. Logged games feed an Elo
-              rating that powers three useful views: how you rank with friends, at each court, and
-              across your region.
+              <strong>Challenge a friend.</strong> Send a 1v1 challenge from a friend&apos;s profile.
+              They receive it in their inbox and can accept or decline. For a ranked game, either
+              player can log the score afterward for the usual review.
             </p>
             <p>
-              Scores are not self-reported into the void. Every submission goes to your opponent for
-              review. They can approve it, or dispute it with a corrected score and a note. Disputed
-              games are held while both sides work it out, with an auto-approve countdown so nothing
-              stalls forever, and games that cannot be settled are voided rather than recorded
-              wrong.
+              <strong>Keep it casual.</strong> A casual invitation is simply a plan to meet a friend
+              at a court and time. It does not create a scored result or change your game count,
+              win-loss record, head-to-head history, Elo, or rankings.
+            </p>
+            <p>
+              <strong>Play for a result.</strong> Normal Log Game submissions are ranked. Log the
+              sport, court, date, matchup, and score. Once the result is finalized, it counts toward
+              your record and Elo, which powers friend, court, and regional rankings.
+            </p>
+            <p>
+              Every submitted score enters review. The other players can approve it or dispute it.
+              An undisputed pending score automatically confirms after three days. A dispute holds
+              the game for correction; a corrected submission starts a new review. An unresolved
+              hold or a third dispute voids the game without changing ratings.
+            </p>
+            <p>
+              <strong>Hide the numbers, keep the result.</strong> A player can hide the score when
+              logging or confirming a counted game, or afterward. If any player hides it, people
+              outside the game see Win or Loss instead of the numeric score wherever the game is
+              visible. The players in the game still see the full score. The game counts normally
+              toward game totals, win-loss records, head-to-head history, Elo, and rankings.
             </p>
             <p>
               Player profiles carry the result: record, check-ins, games played, head-to-head
-              history against you, and recent activity.
+              history against you, and recent activity. Head-to-head shows who leads the series,
+              average margin, your net Elo change, last played, and recent confirmed games against
+              each other, including games on opposing teams.
             </p>
           </section>
 

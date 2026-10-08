@@ -288,6 +288,15 @@ export function AppOverview() {
             <p>
               LocalCheck separates a claimed score from a settled result. A submitted game enters review. The opponent can approve it or open a dispute. Only a finalized result reaches the record and the rating.
             </p>
+            <p>
+              Challenge a friend to a ranked game, or send a casual invitation to meet at a court
+              and time. Casual invitations are scheduling only: they do not affect game counts,
+              records, head-to-head history, Elo, or rankings.
+            </p>
+            <p>
+              A counted game can show Win or Loss instead of the numeric score to other players.
+              Hiding the score keeps the result, game count, record, and rating intact.
+            </p>
           </Reveal>
 
           <div className={styles.eloStory}>

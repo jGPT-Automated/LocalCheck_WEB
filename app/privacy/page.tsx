@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
           <h1 id="privacy-title">Privacy<br />Policy<span>.</span></h1>
         </div>
         <div className="legal-meta" aria-label="Policy publication details">
-          <p><span>Effective date</span><strong>October 1, 2026</strong></p>
+          <p><span>Effective date</span><strong>October 7, 2026</strong></p>
           <p>
             <span>Questions or requests</span>
             <strong><a href="mailto:localchecksports@gmail.com">localchecksports@gmail.com</a></strong>
@@ -133,6 +133,19 @@ export default function PrivacyPolicy() {
               <li><strong>Friends Only.</strong> Friends can identify your activity; players who are not your friends see an anonymous check-in where the app indicates one.</li>
               <li><strong>Private.</strong> Your profile is hidden from court rosters and leaderboards where the app indicates that control applies.</li>
             </ul>
+            <p>
+              <strong>Game visibility.</strong> A game can appear in public court feeds and on
+              profiles for people outside the game only when every participant is Public. If any
+              participant is Friends Only or Private, only the players in that game can see it,
+              including when an outside viewer is a friend.
+            </p>
+            <p>
+              <strong>Hidden scores.</strong> Each player can choose to hide a game&apos;s numeric
+              score. If anyone hides it, people outside the game see Win or Loss wherever the game
+              is otherwise visible. The participants still see the full score. Hiding the score
+              does not change the result, game count, win-loss record, head-to-head history, Elo,
+              or rankings.
+            </p>
             <p>
               Your selected setting does not turn public court facts into private information.
               For example, a verified court&apos;s name, location, and facilities may remain visible
