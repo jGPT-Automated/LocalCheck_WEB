@@ -1,7 +1,14 @@
 # LocalCheck — Launch & Growth Working Brief
 
-**Status:** Living strategy document  
+**Status:** Historical research and launch hypotheses; not the current product contract
 **Last updated:** September 12, 2026
+
+Read the app's [latest approved decisions](https://github.com/jGPT-Automated/LocalCheck_Expo/blob/main/docs/product/DECISIONS.md)
+and any newer approved app PR before using this research for website copy.
+Reward thresholds, billing, rollout sequence, and proposed contribution flows
+below are historical inputs, not evidence that an entitlement or feature is
+deployed. See the [website audit](../docs/audits/2026-10-14-documentation.md)
+for the October reconciliation. Keep new product decisions in the app repo.
 
 > Purpose: capture launch thinking, research findings, competitive lessons, open questions, experiments, and decisions without letting strategy work delay launch.
 
@@ -390,3 +397,4 @@ It is:
 > **Can LocalCheck make one real court measurably more useful and culturally sticky—and then reproduce that node?**
 
 If yes, sport prioritization becomes an allocation problem informed by real retention, activation and monetization data instead of a reason to postpone launch.
+

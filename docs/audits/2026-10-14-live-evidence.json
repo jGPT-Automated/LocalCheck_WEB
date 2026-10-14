@@ -1,0 +1,136 @@
+{
+  "observed_on": "2026-10-14",
+  "recorded_at_utc": "2026-10-14 07:37:11 UTC",
+  "method": "Firecrawl scrape with maxAge: 0; read-only GET observations. Exact deployment commit and app device behavior were not independently verified.",
+  "website_main": "529b7fbd2e6870a682bd2a8e5bf45b22c37c16ae",
+  "website_pr22": "214c279639203ba010ac339cabce139faff0df1c",
+  "app_main": "541632c05488c0cd02e1997b58feaa6534ccf1f3",
+  "app_pr67": "1ead7f7647c1c92d84b5ea3183c29ac81f619aa1",
+  "pages": [
+    {
+      "url": "https://localchecksports.com/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-6d53-71af-b25b-780856b3b6f0",
+      "excerpts": [
+        "**1** cities now mapped",
+        "[Explore 1 courts](https://localchecksports.com/courts) [See how it works](https://localchecksports.com/how-it-works)",
+        "### Kasmiersky Park",
+        "[See the app](https://localchecksports.com/app) [View court](https://localchecksports.com/courts/kasmiersky-park-c09ec673)",
+        "Public global standings are not available on the web yet. Once reviewed results and player visibility are ready, the rankings will appear here."
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/courts",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-5614-722e-b537-31271072d592",
+      "excerpts": [
+        "**1court**Supabase live",
+        "## Kasmiersky Park"
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/api/courts",
+      "status": 200,
+      "contentType": "application/json",
+      "scrapeId": "01a1394f-e6b9-764a-a945-b7f1556a90a2",
+      "excerpts": [
+        "{\"courts\":[{\"id\":\"abe05196-a2d2-469e-b919-0435a056d9a3\",\"slug\":\"kasmiersky-park-c09ec673\",\"name\":\"Kasmiersky Park\",\"shortName\":\"Kasmiersky Park\",\"sport\":\"basketball\",\"market\":\"Houston\",\"address\":\"889 Old Magnolia Rd\",\"city\":\"Conroe\",\"state\":\"TX\",\"latitude\":30.2937615978393,\"longitude\":-95.4771004069237,\"courtCount\":null,\"setting\":\"outdoor\",\"surface\":\"\",\"indoor\":false,\"hasLights\":null,\"accessType\":\"public_free\",\"verified\":true,\"verificationStatus\":\"source_and_detection\",\"sourceUrl\":\"https://maps.apple.com/?ll=30.293762,-95.477100\",\"priority\":0,\"liveCount\":0,\"localCount\":1}],\"source\":\"supabase\"}"
+      ],
+      "response": {
+        "courts": [
+          {
+            "id": "abe05196-a2d2-469e-b919-0435a056d9a3",
+            "slug": "kasmiersky-park-c09ec673",
+            "name": "Kasmiersky Park",
+            "shortName": "Kasmiersky Park",
+            "sport": "basketball",
+            "market": "Houston",
+            "address": "889 Old Magnolia Rd",
+            "city": "Conroe",
+            "state": "TX",
+            "latitude": 30.2937615978393,
+            "longitude": -95.4771004069237,
+            "courtCount": null,
+            "setting": "outdoor",
+            "surface": "",
+            "indoor": false,
+            "hasLights": null,
+            "accessType": "public_free",
+            "verified": true,
+            "verificationStatus": "source_and_detection",
+            "sourceUrl": "https://maps.apple.com/?ll=30.293762,-95.477100",
+            "priority": 0,
+            "liveCount": 0,
+            "localCount": 1
+          }
+        ],
+        "source": "supabase"
+      }
+    },
+    {
+      "url": "https://localchecksports.com/how-it-works",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-9f39-736c-a48c-0db3b1eee71d",
+      "excerpts": [
+        "It is free, iOS-only, and there is nothing to buy inside it.",
+        "Check-in is geofenced, so it only works when you are physically at the court. That constraint is the whole point. It means a live count of three is three real people, not three optimistic taps from a couch.",
+        "Yes. Check-in is geofenced, so it only works when you are physically at the court. That is deliberate: it keeps the live count honest, so when the app says people are there, people are there.",
+        "Your precise location is used to show nearby courts and to enable geofenced check-in. Other players see that a court has check-ins and who is at it when you check in — not your continuous location. Location permission can be withdrawn in your device settings at any time."
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/pioneers",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-7d74-7509-8cba-7e7711fe7e01",
+      "excerpts": [
+        "Be one of the first 100 people to download and join LocalCheck. The free LocalPlus year is redeemed with an Apple offer code in the app. It is a monthly subscription with the first year free, then renews at the regular monthly price unless canceled through Apple."
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/terms",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-c058-7335-a9f2-a09b20cad278",
+      "excerpts": [
+        "LocalCheck offers core court features for free and may offer optional LocalPlus features through an auto-renewing monthly subscription. The app shows the current price, billing period, and included access before you confirm a purchase. Apple processes payment to your Apple ID; LocalCheck does not receive your full payment-card details.",
+        "LocalCheck may offer trials, Apple offer codes, Starter access, Founder access, or other promotions. The specific offer controls its length, eligibility, renewal, and expiration. Promotions have no cash value, may not be transferred, and may be changed or withdrawn where allowed by law. A complimentary period does not become paid unless the offer or purchase screen clearly says it will."
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/llms.txt",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "scrapeId": "01a1394f-afd4-75bc-822f-845c900aaca6",
+      "excerpts": [
+        "LocalCheck covers 57 source-backed courts across 7 US cities at launch: 29 basketball and 28 pickleball. Contact: localchecksports@gmail.com.",
+        "- **Geofenced check-in.** Check-in only works when you are physically at the court, so a live count of three means three real people. Counts start at zero and are never fabricated.",
+        "- [How LocalCheck works](https://localchecksports.com/how-it-works): Full explanation of the weekly heatmap, geofenced check-in, scheduled runs, Elo ratings and score disputes, home courts, and AI-verified court submissions. Includes answers to the most common questions.",
+        "- [Kasmiersky Park](https://localchecksports.com/courts/kasmiersky-park-c09ec673): Basketball · Conroe, TX · public and free. Live check-ins, weekly plan heatmap, and access details.",
+        "- Platform: iOS. Core app: free. LocalPlus: optional subscription.",
+        "- [Fonde Recreation Center](https://localchecksports.com/courts/houston-basketball-fonde-rec): Basketball · Houston, TX · public and free. Live check-ins, weekly plan heatmap, and access details.",
+        "- [Cheviot Hills Recreation Center](https://localchecksports.com/courts/los-angeles-pickleball-cheviot-hills): Pickleball · Los Angeles, CA · public and free. Live check-ins, weekly plan heatmap, and access details.",
+        "- [Rancho Cienega Sports Complex](https://localchecksports.com/courts/los-angeles-basketball-rancho-cienega): Basketball · Los Angeles, CA · public and free. Live check-ins, weekly plan heatmap, and access details."
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/privacy",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-8e72-7785-b8c9-c75d78e1b8fd",
+      "excerpts": [
+        "- **Location.** If you grant permission, LocalCheck uses foreground precise location to find nearby courts and support location-based features. Court submissions also include the court's location."
+      ]
+    },
+    {
+      "url": "https://localchecksports.com/app",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "scrapeId": "01a1394f-d518-7782-8b02-18f0f92617d5",
+      "excerpts": []
+    }
+  ]
+}

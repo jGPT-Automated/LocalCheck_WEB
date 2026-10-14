@@ -7,6 +7,7 @@
   },
   "scripts": {
     "install:ci": "bash scripts/install-ci.sh",
+    "check:docs": "node --test tests/documentation.test.mjs",
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
     "build": "bash scripts/build-verified.sh",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
@@ -55,3 +56,4 @@
   "type": "module",
   "displayName": "LocalCheck"
 }
+

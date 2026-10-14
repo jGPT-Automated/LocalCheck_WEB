@@ -33,10 +33,20 @@ distance bands are evidence for review, not proof that the source venue and
 detection are the same object. Pickleball rows are source-verified independently
 because the original detection run did not cover that sport.
 
-## Launch scope
+## Catalog scope and public visibility
 
-The MVP catalog contains 56 courts: four basketball and four pickleball venues
-in each of New York City, Washington DC, Miami, Los Angeles, Houston, Austin,
-and Denver. Access is explicit (`public_free`, `public_paid`, or
-`private_paid`) so a polished map never implies that every venue is free.
+The bundled files under `data/` are historical source-backed catalog and seed
+artifacts, used by the website as a maintenance fallback. Their row count and
+original market coverage do not describe the app's current public inventory.
+Current public visibility is owned by the shared app/backend contract; consult
+the app's [account and court runbook](https://github.com/jGPT-Automated/LocalCheck_Expo/blob/main/docs/runbooks/ACCOUNT_TAGS.md)
+and newer approved app PR decisions before making a coverage claim. See the
+[dated website audit](audits/2026-10-14-documentation.md) for observed inventory
+and the known fallback/caching mismatch.
+
+Access is explicit (`public_free`, `public_paid`, or `private_paid`); neither
+source verification nor a free app download implies free venue access. These
+provenance rules describe the historical website catalog. The app's live-camera
+court-verification workflow has its own authority in the app repository.
+
 
