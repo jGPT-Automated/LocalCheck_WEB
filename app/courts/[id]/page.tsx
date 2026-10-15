@@ -95,14 +95,14 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
       neighborhood: [listing.city, listing.state].filter(Boolean).join(", ") || "Local court",
       distance: "Map listing",
       coordinates: [listing.longitude, listing.latitude],
-      liveCount: listing.liveCount ?? 0,
-      localCount: listing.localCount ?? 0,
-      liveNote: listing.liveCount ? "Players checked in" : "No public check-ins yet",
+      liveCount: listing.liveCount,
+      localCount: listing.localCount,
+      liveNote: listing.liveCount === null ? "Live count unavailable" : listing.liveCount ? "Players checked in" : "No public check-ins right now",
       details: [
         { label: "Setup", value: listing.courtCount ? `${listing.courtCount} ${listing.courtCount === 1 ? "court" : "courts"}` : "Not listed" },
         { label: "Access", value: access },
         { label: "Setting", value: setting },
-        { label: "Status", value: listing.verified ? "Source verified" : "Needs review" },
+        { label: "Status", value: "Community added" },
       ],
     } satisfies CourtDetail;
   }

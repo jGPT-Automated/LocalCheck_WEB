@@ -17,7 +17,8 @@ import {
 import styles from "./site-header.module.css";
 
 const SITE_NAV_ITEMS = [
-  { href: "/courts", label: "Courts" },
+  { href: "/courts", label: "Community courts" },
+  { href: "/court-directory", label: "Find a court" },
   { href: "/how-it-works", label: "How it works" },
 ] as const;
 

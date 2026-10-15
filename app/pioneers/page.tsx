@@ -82,11 +82,11 @@ const faqs = [
   },
   {
     q: "Can I verify a court that's already listed?",
-    a: "You can use, check in at, and help organize an already listed court. To qualify for the Pioneer launch offer, add a court that is not yet on the map and bring five invited players who each check in weekly for four weeks.",
+    a: "You can use, check in at, and help organize an already listed court. A location appearing in the public court directory is not the same as a court verified in the app. To qualify for the Pioneer launch offer, verify and add a court through the app and bring five invited players who each check in weekly for four weeks.",
   },
   {
     q: "How do I become a Starter?",
-    a: "Be one of the first 100 people to download and join LocalCheck. The free LocalPlus year is redeemed with an Apple offer code in the app. It is a monthly subscription with the first year free, then renews at the regular monthly price unless canceled through Apple.",
+    a: "Be one of the first 100 people to download and join LocalCheck. Your free year of LocalPlus is granted in the app. The Starter reward does not automatically renew into a paid subscription.",
   },
   {
     q: "How do you prevent fake courts?",

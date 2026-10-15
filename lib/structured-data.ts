@@ -39,7 +39,7 @@ export function websiteSchema() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${SITE_URL}/courts?q={search_term_string}`,
+        urlTemplate: `${SITE_URL}/court-directory?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -193,5 +193,5 @@ export function breadcrumbSchema(trail: ReadonlyArray<{ name: string; path: stri
 
 /** Serialize for a <script type="application/ld+json"> tag. */
 export function jsonLd(schema: unknown) {
-  return { __html: JSON.stringify(schema) };
+  return { __html: JSON.stringify(schema).replace(/</g, "\\u003c") };
 }

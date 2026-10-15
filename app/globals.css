@@ -4559,3 +4559,12 @@ a:focus-visible {
     @apply font-sans;
   }
 }
+
+/* Court detail: Playtomic place/action hierarchy, Strava product evidence.
+   Composition uses existing shadcn controls and the existing Mapbox map. */
+.court-detail-back{display:block;color:#b8b8c2;font-size:13px;margin-bottom:28px}
+.court-page__actions [data-slot=button]{height:auto;min-height:48px;padding:14px 20px;border-radius:4px;white-space:normal}
+.court-page__actions [data-slot=button]:first-child{background:#fc4c02;color:#0d0d10}
+.court-detail-invite{padding:28px}.court-detail-invite h2{font:600 40px/1.1 Oswald,sans-serif;margin:18px 0}.court-detail-invite p{color:#b8b8c2;line-height:1.7;margin-bottom:24px}.court-detail-invite [data-slot=button]{min-height:44px}
+.court-detail-story{max-width:1280px;margin:72px auto;display:grid;grid-template-columns:1fr 300px;gap:64px;align-items:center;padding:64px;background:#f0efeb;color:#151519;overflow:hidden}.court-detail-story h2{font:600 clamp(36px,4vw,60px)/1.08 Oswald,sans-serif;margin:20px 0}.court-detail-story p{line-height:1.8;max-width:50ch;color:#52525c;margin-bottom:24px}.court-detail-story img{width:100%;height:430px;object-fit:cover;object-position:top;border:8px solid #151519;border-radius:30px}.court-detail-story [data-slot=button]{min-height:48px}.court-detail-faq{max-width:1000px;margin:64px auto;padding:0 24px}.court-detail-faq h2{font:600 40px Oswald,sans-serif;margin-bottom:24px}.court-detail-faq [data-slot=accordion-trigger]{min-height:56px}.court-detail-faq a{color:#ff8855;text-decoration:underline}
+@media(max-width:700px){.court-detail-story{margin:32px 20px;padding:32px;grid-template-columns:1fr;gap:32px}.court-detail-story img{max-width:260px;margin:auto;height:340px}.court-page__actions{flex-wrap:wrap}.court-page__actions [data-slot=button]{width:100%}}

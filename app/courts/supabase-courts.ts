@@ -1,3 +1,4 @@
+import { isPublicCommunityCourt } from "../../lib/public-court";
 import launchCourtRows from "../../data/launch-courts.json";
 import { courtShortName } from "../../lib/court-name";
 
@@ -32,7 +33,7 @@ export type ExplorerCourt = {
 
 export type CourtDataResult = {
   courts: ExplorerCourt[];
-  source: "supabase" | "curated";
+  source: "supabase" | "unavailable";
 };
 
 type RuntimeEnv = {
@@ -250,35 +251,27 @@ async function fetchRows(path: string, query: Record<string, string>) {
 
 export async function loadExplorerCourts(): Promise<CourtDataResult> {
   try {
-    const rows = await fetchRows("courts_with_stats", {
-      select: "*",
-      order: "launch_priority.desc,name.asc",
-      limit: "250",
-    });
-    const courts = rows.map(normalizeCourt).filter((court): court is ExplorerCourt => Boolean(court));
-    if (courts.length) return { courts, source: "supabase" };
+    const allRows: RawCourt[] = [];
+    for (let offset = 0; ; offset += 250) {
+      const rows = await fetchRows("courts_with_stats", {select: "*", order: "id.asc", limit: "250", offset: String(offset)});
+      allRows.push(...rows);
+      if (rows.length < 250) break;
+    }
+    const courts = allRows.filter(isPublicCommunityCourt).map(normalizeCourt).filter((court): court is ExplorerCourt => Boolean(court));
+    return { courts, source: "supabase" };
   } catch {
-    // The source-backed launch set keeps the map usable during maintenance.
+    return { courts: [], source: "unavailable" };
   }
-
-  return { courts: launchCourts, source: "curated" };
 }
 
 export async function loadExplorerCourt(idOrSlug: string): Promise<ExplorerCourt | null> {
   try {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug);
-    const rows = await fetchRows("courts_with_stats", {
-      select: "*",
-      [isUuid ? "id" : "slug"]: `eq.${idOrSlug}`,
-      limit: "1",
-    });
-    const court = rows.length ? normalizeCourt(rows[0], 0) : null;
-    if (court) return court;
+    const rows = await fetchRows("courts_with_stats", { select: "*", [isUuid ? "id" : "slug"]: `eq.${idOrSlug}`, limit: "1" });
+    return rows.length && isPublicCommunityCourt(rows[0]) ? normalizeCourt(rows[0], 0) : null;
   } catch {
-    // Fall through to the bundled, verified catalog.
+    return null;
   }
-
-  return launchCourts.find((court) => court.id === idOrSlug || court.slug === idOrSlug) ?? null;
 }
 
 export type CourtPlannedTimesResult = {
@@ -332,10 +325,10 @@ export async function loadCourtPlannedTimes(
     if (!response.ok) return { plannedAt: [], source: "unavailable" };
 
     const rows = await response.json();
-    const plannedAt = Array.isArray(rows)
-      ? rows.filter((value): value is string => typeof value === "string" && !Number.isNaN(Date.parse(value)))
-      : [];
-    return { plannedAt, source: "supabase" };
+    if (!Array.isArray(rows) || !rows.every(value => typeof value === "string" && !Number.isNaN(Date.parse(value)))) {
+      return { plannedAt: [], source: "unavailable" };
+    }
+    return { plannedAt: rows as string[], source: "supabase" };
   } catch {
     return { plannedAt: [], source: "unavailable" };
   }

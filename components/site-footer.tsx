@@ -4,6 +4,10 @@ import { SiteBrand } from "./site-header";
 import styles from "./site-footer.module.css";
 
 const FOOTER_LINKS = [
+  { href: "/court-directory", label: "Court directory & data" },
+  { href: "/courts", label: "Community courts" },
+  { href: "/pioneers", label: "Pioneers" },
+  { href: "/app", label: "The app" },
   { href: "/support", label: "Help" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },

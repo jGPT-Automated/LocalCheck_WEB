@@ -26,11 +26,16 @@
 
 .navigation {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: clamp(22px, 3vw, 42px);
 }
 
 .navigation a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 0.7rem;
   font-weight: 720;
   letter-spacing: 0.1em;
@@ -66,3 +71,5 @@
     gap: 20px;
   }
 }
+
+@media(max-width:780px){.navigation{justify-content:flex-start;gap:12px 24px}}
