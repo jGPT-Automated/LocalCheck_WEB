@@ -72,19 +72,12 @@ test("renders the court explorer with a mobile horizontal result rail", async ()
 
   assert.equal(response.status, 200);
   assert.match(html, /data-mobile-court-rail=["']true["']/i);
-  assert.match(html, /Your courts, activity, and competition in one shared place/i);
+  assert.match(html, /User-verified courts, live check-ins, and people to play with/i);
 });
 
-test("renders court details as a read-only view of the app schedule", async () => {
+test("does not resurrect archived seed courts as standalone community pages", async () => {
   const response = await render("/courts/los-angeles-basketball-rancho-cienega");
-  const html = await response.text();
-
-  assert.equal(response.status, 200);
-  assert.match(html, /8 AM/i);
-  assert.match(html, /10 PM/i);
-  assert.match(html, /View only/i);
-  assert.match(html, /Open the LocalCheck app to add or change plans/i);
-  assert.doesNotMatch(html, /Check in now|Make this local|Make this my local court|I(?:&apos;|')m going|Remove my time/i);
+  assert.equal(response.status, 404);
 });
 
 test("renders the canonical community platform message on the homepage", async () => {
@@ -116,7 +109,8 @@ test("renders an intentional homepage footer with real destinations", async () =
   const footer = html.match(/<footer[^>]*data-site-footer=["']true["'][^>]*>[\s\S]*?<\/footer>/i)?.[0] ?? "";
 
   assert.equal(response.status, 200);
-  assert.doesNotMatch(footer, /href=["']\/(courts|app|how-it-works|pioneers)["']/i);
+  assert.match(footer, /href=["']\/court-directory["']/i);
+  assert.match(footer, /href=["']\/pioneers["']/i);
   assert.match(footer, /href=["']\/support["'][^>]*>Help</i);
   assert.match(footer, /href=["']\/privacy["'][^>]*>Privacy</i);
   assert.match(footer, /href=["']\/terms["'][^>]*>Terms</i);
@@ -163,7 +157,8 @@ test("renders one consistent site header on every public page", async () => {
     "/privacy",
     "/terms",
     "/courts",
-    "/courts/los-angeles-basketball-rancho-cienega",
+    "/court-directory",
+    "/court-directory/tx",
   ];
 
   for (const route of routes) {
@@ -172,7 +167,7 @@ test("renders one consistent site header on every public page", async () => {
 
     assert.equal(response.status, 200, route);
     const header = sharedHeader(html);
-    assert.match(header, /href=["']\/courts["'][^>]*>Courts</i, route);
+    assert.match(header, /href=["']\/courts["'][^>]*>Community courts</i, route);
     assert.match(header, /href=["']\/how-it-works["'][^>]*>How it works</i, route);
     assert.doesNotMatch(header, />Heatmap</i, route);
     assert.doesNotMatch(header, />Competition</i, route);
@@ -222,8 +217,8 @@ test("explains the current launch reward rules on the Pioneers page", async () =
   assert.match(html, /five invited players/i);
   assert.match(html, /once a week for four weeks/i);
   assert.match(html, /one month of LocalPlus/i);
-  assert.match(html, /Apple offer code/i);
-  assert.match(html, /renews at the regular monthly price unless canceled/i);
+  assert.doesNotMatch(html, /Apple offer code/i);
+  assert.match(html, /does not automatically renew into a paid subscription/i);
   assert.doesNotMatch(html, /\+3 months of LocalPlus|\+1 month per player/i);
 });
 
@@ -246,4 +241,22 @@ test("describes a free core app without contradicting the LocalPlus launch offer
   assert.doesNotMatch(how, /no in-app purchases, no subscription/i);
   assert.match(llms, /LocalPlus launch offers/i);
   assert.doesNotMatch(llms, /no purchases, no subscription|no in-app purchases/i);
+});
+
+
+test("directory serves geographic data in HTML without standalone source-court URLs", async () => {
+ const html=await (await render("/court-directory/tx?q=Conroe")).text();
+ assert.match(html,/Conroe/);
+ assert.match(html,/607709637/);
+ assert.match(html,/30.30270/);
+ assert.doesNotMatch(html,/href="\/courts\/607709637"/);
+});
+test("nearby API sorts by distance, bounds pages and rejects invalid coordinates",async()=>{
+ const response=await render("/api/court-directory?lat=30.3&lon=-95.47&limit=3");
+ assert.equal(response.status,200);
+ const result=await response.json();
+ assert.equal(result.records.length,3);
+ assert.ok(result.records[0].distance_km<=result.records[1].distance_km);
+ assert.equal(result.next_offset,3);
+ assert.equal((await render("/api/court-directory?lat=91&lon=0")).status,400);
 });

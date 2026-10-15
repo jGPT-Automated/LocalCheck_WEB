@@ -1,20 +1,16 @@
 # LocalCheck Web
 
-LocalCheck is a dark, map-first court explorer for basketball and pickleball.
-This MVP ships a source-backed launch catalog of 56 courts across New York
-City, Washington DC, Miami, Los Angeles, Houston, Austin, and Denver.
+LocalCheck connects basketball and pickleball communities through activity, planned play and competition.
 
-## What is included
+## Current website
+- `/courts` and `/courts/[id]`: user-added community courts and public activity from the app feed. Imported locations do not become standalone community pages.
+- `/court-directory`: 59,705 basketball source locations with state browsing and locality search.
+- `/api/court-directory`: filter by `state` or `q`, or supply `lat` and `lon` for nearest results. `limit` (1–100) and `offset` paginate results.
+- `/data/courts/basketball.csv`, `basketball.json`, and `manifest.json`: normalized downloads, data dictionary and provenance.
 
-- Responsive Mapbox court explorer with sport, city, and text filters
-- Compact cultural/venue names plus canonical official names
-- Basketball and pickleball cards with distinct court geometry
-- Court detail pages with check-in, local-court state, and weekly planning UI
-- Supabase schema, RLS policy, public stats view, and idempotent seed
-- Review workbook and source/provenance fields for every launch court
+The resource supports discovery. LocalCheck supplies community and activity. The owner compiled the source through web scraping and Gemini satellite analysis. Original coordinate column labels were reversed and are normalized. Missing names, hours and access details are not invented.
 
-The launch catalog intentionally starts live/local counters at zero. Product
-surfaces do not fabricate players, planned visits, or traffic curves.
+See [settled decisions](docs/court-discovery-release.md). Historical seed files are not a runtime fallback. Rebuild data with `python3 scripts/prepare-court-resource.py /path/to/original.csv`.
 
 ## Run locally
 

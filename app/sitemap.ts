@@ -1,3 +1,4 @@
+import { resourceStates } from "../lib/court-resource";
 import type { MetadataRoute } from "next";
 import { loadExplorerCourts } from "./courts/supabase-courts";
 import { SITE_URL } from "../lib/site";
@@ -25,6 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/how-it-works`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/courts`, changeFrequency: "weekly", priority: 0.9 },
     ...courtEntries,
+    { url: `${SITE_URL}/court-directory`, changeFrequency: "monthly", priority: 0.9 },
+    ...resourceStates.map(state => ({url: `${SITE_URL}/court-directory/${state.code.toLowerCase()}`, changeFrequency: "monthly" as const, priority: 0.7})),
     { url: `${SITE_URL}/support`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/pioneers`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.3 },

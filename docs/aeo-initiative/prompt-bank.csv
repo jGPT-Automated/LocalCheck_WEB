@@ -1,0 +1,11 @@
+prompt_id,sport,prompt,location_mode
+B01,basketball,Where can I play basketball near me?,implicit
+B02,basketball,"Are there any basketball courts near Conroe, Texas?",explicit
+B03,basketball,"Where do people play pickup basketball in Conroe, Texas?",explicit
+B04,basketball,Which basketball courts in Conroe usually have people playing pickup?,explicit
+B05,basketball,Where can I find a casual basketball game near me tonight?,implicit
+B06,basketball,How can I tell if anyone is playing at Kasmiersky Park right now?,named court
+B07,basketball,"Where can I play basketball in Houston, Texas?",explicit expansion
+B08,basketball,"Where do people play pickup basketball in Austin, Texas?",explicit holdout
+P01,pickleball,Where can I play pickleball near me?,future cohort
+P02,pickleball,Which pickleball courts near me have people for casual open play?,future cohort

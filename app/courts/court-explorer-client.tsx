@@ -24,7 +24,7 @@ type MapState = "loading" | "ready" | "unavailable";
 type Props = {
   initialCourts: ExplorerCourt[];
   mapboxToken: string;
-  source: "supabase" | "curated";
+  source: "supabase" | "unavailable";
 };
 
 function featureCollection(courts: ExplorerCourt[]) {
@@ -342,9 +342,9 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
         if (!response.ok) return;
         const result = await response.json() as {
           courts?: ExplorerCourt[];
-          source?: "supabase" | "curated";
+          source?: "supabase" | "unavailable";
         };
-        if (result.source === "supabase" && result.courts?.length) {
+        if (result.source === "supabase" && Array.isArray(result.courts)) {
           setCourts(result.courts);
           setDataSource("supabase");
         }
@@ -599,7 +599,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
           <div className={styles.sidebarHeader}>
             <span className={styles.eyebrow}><i /> Find your run</span>
             <div className={styles.titleRow}>
-              <div><h1>Find a court.</h1><p>Your courts, activity, and competition in one shared place.</p></div>
+              <div><h1>Your local game.</h1><p>User-verified courts, live check-ins, and people to play with. <Link href="/court-directory">Browse 59,705 basketball locations →</Link></p></div>
               <button className={styles.mobileFilter} type="button" onClick={() => setFiltersOpen((value) => !value)} aria-label="Toggle filters" aria-expanded={filtersOpen}>
                 {filtersOpen ? <X size={19} /> : <SlidersHorizontal size={19} />}
               </button>
@@ -634,7 +634,7 @@ export default function CourtExplorerClient({ initialCourts, mapboxToken, source
             {filteredCourts.length ? filteredCourts.slice(0, 120).map((court) => (
               <CourtListCard court={court} selected={court.id === selectedId} onSelect={() => selectCourt(court)} key={court.id} />
             )) : (
-              <div className={styles.emptyState}><MapPin size={25} weight="fill" /><strong>No courts found</strong><p>Try another city or switch the sport filter.</p></div>
+              <div className={styles.emptyState}><MapPin size={25} weight="fill" /><strong>{dataSource === "unavailable" ? "Community activity is temporarily unavailable" : "No community courts match yet"}</strong><p><Link href="/court-directory">Browse the basketball location directory</Link> or <Link href="/pioneers">bring your court to LocalCheck</Link>.</p></div>
             )}
             {filteredCourts.length > 120 ? <p className={styles.listLimit}>All {filteredCourts.length.toLocaleString()} markers are on the map. Refine the search to narrow the side list.</p> : null}
           </div>

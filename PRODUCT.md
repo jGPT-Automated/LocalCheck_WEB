@@ -38,3 +38,7 @@ Do not turn LocalCheck into a generic productivity SaaS page, a soft pastel well
 ## Accessibility & Inclusion
 
 Target WCAG 2.2 AA contrast and keyboard behavior. Respect reduced-motion preferences, never rely on color alone for heatmap intensity or match outcomes, maintain 44px minimum touch targets, and keep body copy readable at narrow widths.
+
+## Court resource and community — authoritative decision
+
+See [court discovery release](docs/court-discovery-release.md). The geographic resource makes locations findable. Only user-added/verified app courts receive standalone community pages. Dataset presence never determines Pioneer eligibility. LocalCheck’s differentiation is community and activity.

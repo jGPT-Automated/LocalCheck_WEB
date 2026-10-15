@@ -1,42 +1,17 @@
 # LocalCheck court data standard
 
-The public court name is an identity, not a row number. Every launch court has
-two human-readable names and keeps machine provenance in separate fields.
+## Geographic resource
+The source dataset makes locations discoverable. Preserve source ID, locality, state and normalized WGS84 coordinates. Locality is not a court name. Source records never generate standalone court pages. Do not invent names, addresses, hours, access or amenities.
 
-## Naming convention
+Owner-provided provenance: web scraping plus Gemini satellite analysis/finding. Row-level sources and observation dates were not supplied. The manifest records this. Original latitude/longitude labels were reversed; the preparation script applies one documented transform and rejects invalid coordinates or duplicate IDs.
 
-| Field | Purpose | Example |
-| --- | --- | --- |
-| `name` | Canonical, source-backed facility or court name | `West 4th Street Courts` |
-| `short_name` | Compact Explore-card label or well-known alias | `The Cage` |
-| `slug` | Stable URL/import key, prefixed by market and sport | `new-york-city-basketball-the-cage` |
-| `raw_source_name` | Original imported label for audit only | `Court 440055116` |
+## Community courts
+Only user-added/verified app courts receive standalone pages. Public selection excludes archived, test, deleted, private and explicitly unconfirmed records. Unknown activity stays null, distinct from zero. Source verification alone does not turn imported seeds into community courts.
 
-Short names follow this order:
+Names and stable IDs come from the app. Do not auto-merge source rows by locality or coordinates. Directory membership, detail pages and sitemap share the public eligibility rule. Empty/error responses never restore the bundled seed catalog.
 
-1. Use an established cultural alias when it is unambiguous (`The Cage`).
-2. Otherwise keep the distinctive facility name and remove generic suffixes
-   such as “Recreation Center,” “Basketball Courts,” or “Pickleball Courts.”
-3. For an unnamed satellite detection, use a shortened street label plus the
-   sport (`W 155th Court`).
-4. Never display a detector ID, database UUID, or sequential number as a name.
+## Pioneers
+Directory inclusion makes a location findable, not app-verified. A Pioneer verifies/adds the court and invites five people who each check in weekly for four weeks. Directory inclusion does not determine eligibility. This is settled; see [owner decisions](court-discovery-release.md).
 
-Canonical names are used on detail pages and for search. Short names are used
-on map cards and markers. Both remain searchable.
-
-## Verification and provenance
-
-`source_verified` means a court/facility and its address were confirmed by an
-official, venue, community, or editorial source. Basketball rows also retain
-the nearest record from the original satellite-detection CSV as QA metadata;
-distance bands are evidence for review, not proof that the source venue and
-detection are the same object. Pickleball rows are source-verified independently
-because the original detection run did not cover that sport.
-
-## Launch scope
-
-The MVP catalog contains 56 courts: four basketball and four pickleball venues
-in each of New York City, Washington DC, Miami, Los Angeles, Houston, Austin,
-and Denver. Access is explicit (`public_free`, `public_paid`, or
-`private_paid`) so a polished map never implies that every venue is free.
-
+## Historical catalog
+The former 56-court/seven-market seed is historical, not the current public inventory. Seed files must not be restored as an outage fallback.

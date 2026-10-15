@@ -161,7 +161,7 @@ export default async function HowItWorksPage() {
               {stats.markets} cities at launch.
             </p>
             <p>
-              It is free, iOS-only, and there is nothing to buy inside it.
+              The core iOS app is free, with an optional LocalPlus subscription.
             </p>
           </section>
 
